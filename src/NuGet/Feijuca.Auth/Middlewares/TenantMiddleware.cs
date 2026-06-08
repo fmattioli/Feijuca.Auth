@@ -18,6 +18,15 @@ namespace Feijuca.Auth.Middlewares
                 return;
             }
 
+            var isWebSocketRequest = context.Request.Headers.Upgrade.ToString()
+                .Equals("websocket", StringComparison.OrdinalIgnoreCase);
+
+            if (isWebSocketRequest)
+            {
+                await next(context);
+                return;
+            }
+
             var tenants = tenantService.GetTenants();
             var user = tenantService.GetUser();
 

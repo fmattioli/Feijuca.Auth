@@ -1,5 +1,7 @@
-﻿using Feijuca.Auth.Application.Commands.UserRoles;
+﻿using Feijuca.Auth.Application.Commands.GroupRoles;
+using Feijuca.Auth.Application.Commands.UserRoles;
 using Feijuca.Auth.Application.Queries.UserRoles;
+using Feijuca.Auth.Application.Requests.GroupRoles;
 using Feijuca.Auth.Application.Requests.UserRoles;
 using Feijuca.Auth.Attributes;
 using LiteBus.Commands.Abstractions;
@@ -65,6 +67,35 @@ public class UsersRolesController(ICommandMediator commandMediator, IQueryMediat
         if (result.IsSuccess)
         {
             return CreatedAtAction(nameof(GetUserRoles), new { id }, null);
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    /// <summary>
+    /// Removes a role from a specific user in the specified Keycloak realm.
+    /// </summary>
+    /// <returns>
+    /// A 204 No Content status code if the role is successfully removed from the user;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    /// <param name="id">The unique identifier of the user from which the role will be removed.</param>
+    /// <param name="deleteRoleFromUser">An object of type <see cref="T:Feijuca.Auth.Common.Models.RemoveClientRoleFromUserRequest"/> containing the details of the role to be deleted from the user.</param>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> used to observe cancellation requests for the operation.</param>
+    [HttpDelete("{id}/role", Name = nameof(RemoveRoleFromUser))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    public async Task<IActionResult> RemoveRoleFromUser(
+        [FromRoute] string id,
+        [FromBody] RemoveClientRoleFromUserRequest deleteRoleFromUser,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new RemoveClientRoleFromUserCommand(id, deleteRoleFromUser), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
         }
 
         return BadRequest(result.Error);

@@ -75,4 +75,42 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
 
         return Result.Failure(UserRolesErrors.ErrorAddRoleToUser);
     }
+
+    public async Task<Result> RemoveRoleFromGroupAsync(string userId, string clientId, Guid roleId, string roleName, CancellationToken cancellationToken)
+    {
+        var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
+        using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
+
+        var url = httpClient.BaseAddress
+                .AppendPathSegment("admin")
+                .AppendPathSegment("realms")
+                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment("users")
+                .AppendPathSegment(userId)
+                .AppendPathSegment("role-mappings")
+                .AppendPathSegment("clients")
+                .AppendPathSegment(clientId);
+
+        var body = JsonConvert.SerializeObject(new[]
+        {
+            new {
+                id = roleId,
+                name = roleName
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Delete, url)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/json")
+        };
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Success();
+        }
+
+        return Result.Failure(UserRolesErrors.RemovingRoleFromUserError);
+    }
 }

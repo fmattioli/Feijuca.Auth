@@ -44,7 +44,7 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
         return Result<IEnumerable<ClientMapping>>.Failure(UserRolesErrors.ErrorGetUserRoles);
     }
 
-    public async Task<Result> AddClientRoleToUserAsync(string userId, string clientId, Guid roleId, string roleName, string tenant, CancellationToken cancellationToken)
+    public async Task<Result> AddClientRoleToUserAsync(string userId, string clientId, Guid roleId, string roleName, CancellationToken cancellationToken)
     {
         var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
         using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
@@ -52,7 +52,7 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
         var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(tenant)
+                .AppendPathSegment(_tenantService.Tenant.Name)
                 .AppendPathSegment("users")
                 .AppendPathSegment(userId)
                 .AppendPathSegment("role-mappings")

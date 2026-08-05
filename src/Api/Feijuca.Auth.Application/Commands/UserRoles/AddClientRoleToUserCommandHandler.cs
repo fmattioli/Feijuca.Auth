@@ -29,7 +29,6 @@ public class AddClientRoleToUserCommandHandler(IUserRepository userRepository,
                     command.AddRoleToUserRequest.ClientId,
                     role.Id,
                     role.Name,
-                    tenantProvider.Tenant.Name,
                     cancellationToken);
 
                 if (result.IsSuccess)

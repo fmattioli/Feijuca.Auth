@@ -10,6 +10,7 @@ namespace Feijuca.Auth.Infra.CrossCutting.Extensions
         {
             services.AddScoped<IConfigRepository, ConfigRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserRolesRepository, UserRolesRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IGroupRepository, GroupRepository>();
             services.AddScoped<IGroupUsersRepository, UserGroupRepository>();

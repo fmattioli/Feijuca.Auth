@@ -18,6 +18,7 @@ namespace Feijuca.Auth.Domain.Interfaces
         Task<Result<bool>> RevokeSessionAsync(string sessionId, CancellationToken cancellationToken);
         Task<Result<Entities.User>> GetAsync(string username, CancellationToken cancellationToken);
         Task<Result<Entities.User>> GetAsync(string username, string tenant, CancellationToken cancellationToken);
+        Task<Result<Entities.User>> GetByIdAsync(string userId, CancellationToken cancellationToken);
         Task<Result> SendEmailVerificationAsync(string userId, CancellationToken cancellationToken);
         Task<Result<TokenDetails>> LoginAsync(string username, string password, CancellationToken cancellationToken);
         Task<Result<bool>> SignoutAsync(string refreshToken, CancellationToken cancellationToken);

@@ -21,6 +21,11 @@ namespace Feijuca.Auth.Common.Errors
             $"An error occurred while trying to refresh token. {TechnicalMessage}"
         );
 
+        public static Error InvalidId => new(
+            "User.InvalidId",
+            $"An error occurred while trying to get the user. Please check the user ID. {TechnicalMessage}"
+        );
+
         public static Error SignOutError => new(
             "User.SignOutError",
             $"An error occurred while trying to do a sign out {TechnicalMessage}"

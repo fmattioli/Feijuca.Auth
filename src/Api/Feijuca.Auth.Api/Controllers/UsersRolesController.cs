@@ -1,4 +1,6 @@
-﻿using Feijuca.Auth.Application.Queries.UserRoles;
+﻿using Feijuca.Auth.Application.Commands.UserRoles;
+using Feijuca.Auth.Application.Queries.UserRoles;
+using Feijuca.Auth.Application.Requests.UserRoles;
 using Feijuca.Auth.Attributes;
 using LiteBus.Commands.Abstractions;
 using LiteBus.Queries.Abstractions;
@@ -34,6 +36,35 @@ public class UsersRolesController(ICommandMediator commandMediator, IQueryMediat
         if (result.IsSuccess)
         {
             return Ok(result.Data);
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    /// <summary>
+    /// Adds a role to a specific user in the specified Keycloak realm.
+    /// </summary>
+    /// <returns>
+    /// A 201 Created status code if the role is successfully added to the user;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    /// <param name="id">The unique identifier of the user to which the role will be added.</param>
+    /// <param name="addRoleToUser">An object of type <see cref="T:Feijuca.Auth.Common.Models.AddClientRoleToUserRequest"/> containing the details of the role to be added to the user.</param>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> used to observe cancellation requests for the operation.</param>
+    [HttpPost("{id:guid}/role", Name = nameof(AddRoleToUser))]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    public async Task<IActionResult> AddRoleToUser(
+        [FromRoute] string id,
+        [FromBody] AddClientRoleToUserRequest addRoleToUser,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new AddClientRoleToUserCommand(id, addRoleToUser), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(GetUserRoles), new { id }, null);
         }
 
         return BadRequest(result.Error);

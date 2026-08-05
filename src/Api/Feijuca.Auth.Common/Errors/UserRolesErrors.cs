@@ -10,4 +10,9 @@ public static class UserRolesErrors
             "UserRoles.ErrorGetUserRoles",
             $"An error occurred while trying to get user roles: {TechnicalMessage}"
         );
+
+    public static Error ErrorAddRoleToUser => new(
+            "UserRoles.ErrorAddRoleToUser",
+            $"An error occurred while trying to add a role to the user: {TechnicalMessage}"
+        );
 }

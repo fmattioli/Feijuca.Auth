@@ -191,6 +191,35 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             return Result<Domain.Entities.User>.Success(user[0]);
         }
 
+        public async Task<Result<Domain.Entities.User>> GetByIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Result<Domain.Entities.User>.Failure(UserErrors.InvalidId);
+            }
+
+            var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
+            using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
+
+            var url = httpClient.BaseAddress
+                    .AppendPathSegment("admin")
+                    .AppendPathSegment("realms")
+                    .AppendPathSegment(_tenantService.Tenant.Name)
+                    .AppendPathSegment("users")
+                    .AppendPathSegment(userId);
+
+            using var response = await httpClient.GetAsync(url, cancellationToken);
+            var keycloakUserContent = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var user = JsonConvert.DeserializeObject<Domain.Entities.User>(keycloakUserContent)!;
+                return Result<Domain.Entities.User>.Success(user);
+            }
+
+            return Result<Domain.Entities.User>.Failure(UserErrors.InvalidId);
+        }
+
         public async Task<Result<bool>> ResetPasswordAsync(Guid id, string password, CancellationToken cancellationToken)
         {
             var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);

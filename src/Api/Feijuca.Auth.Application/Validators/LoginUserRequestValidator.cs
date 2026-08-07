@@ -10,7 +10,9 @@ namespace Feijuca.Auth.Application.Validators
             RuleFor(x => x.Username)
                 .NotNull()
                 .NotEmpty()
-                .WithMessage($"The {nameof(LoginUserRequest.Username)} is mandatory.");
+                .WithMessage($"The {nameof(LoginUserRequest.Username)} is mandatory.")
+                .EmailAddress()
+                .WithMessage("The admin username must be a valid email address.");
 
             RuleFor(x => x.Password)
                 .NotNull()

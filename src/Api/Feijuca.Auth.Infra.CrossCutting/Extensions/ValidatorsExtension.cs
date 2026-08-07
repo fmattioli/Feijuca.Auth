@@ -1,4 +1,5 @@
 ﻿using Feijuca.Auth.Application.Requests.Auth;
+using Feijuca.Auth.Application.Requests.Config;
 using Feijuca.Auth.Application.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -12,6 +13,7 @@ namespace Feijuca.Auth.Infra.CrossCutting.Extensions
         {
             services.AddFluentValidationAutoValidation(x => x.DisableDataAnnotationsValidation = true);
             services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
+            services.AddScoped<IValidator<AddKeycloakSettingsRequest>, AddKeycloakSettingsRequestValidator>();
 
             return services;
         }

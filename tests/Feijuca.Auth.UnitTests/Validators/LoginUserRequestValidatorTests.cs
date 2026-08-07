@@ -56,7 +56,9 @@ namespace Feijuca.Auth.Api.UnitTests.Validators
         public void Given_ValidUsernameAndPassword_WhenValidatingRequest_Then_ReturnsSuccess()
         {
             // Arrange
-            var loginUserRequest = _fixture.Create<LoginUserRequest>();
+            var loginUserRequest = _fixture.Build<LoginUserRequest>()
+                .With(x => x.Username, "admin@feijuca.com")
+                .Create();
 
             //Act
             var result = _loginUserRequestValidator.Validate(loginUserRequest);

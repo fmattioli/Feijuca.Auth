@@ -216,7 +216,6 @@ namespace Feijuca.Auth.Infra.Data.Repositories
 
             var defaultClientScopes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                "profile",
                 "email",
                 "roles",
                 "web-origins",

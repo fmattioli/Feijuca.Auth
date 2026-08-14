@@ -53,7 +53,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseTenantMiddleware();
 app.UseMiddleware<ConfigValidationMiddleware>();
-app.UseHealthCheckers();
+app.UseHealthCheckers(keycloakSettings);
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI(c =>

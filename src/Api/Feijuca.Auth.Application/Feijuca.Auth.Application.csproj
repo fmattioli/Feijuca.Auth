@@ -19,7 +19,6 @@
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="LiteBus.Commands.Extensions.MicrosoftDependencyInjection" Version="3.1.0" />
 		<PackageReference Include="LiteBus.Queries.Extensions.MicrosoftDependencyInjection" Version="3.1.0" />
-		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Serilog" Version="4.4.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />

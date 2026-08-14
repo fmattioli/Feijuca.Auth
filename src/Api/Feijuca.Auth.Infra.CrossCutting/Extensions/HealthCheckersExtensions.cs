@@ -29,13 +29,16 @@ namespace Feijuca.Auth.Infra.CrossCutting.Extensions
             return services;
         }
 
-        public static void UseHealthCheckers(this IApplicationBuilder app)
+        public static void UseHealthCheckers(this IApplicationBuilder app, KeycloakSettings keycloakSettings)
         {
-            app.UseHealthChecks("/health", new HealthCheckOptions
+            if (keycloakSettings != null)
             {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
+                app.UseHealthChecks("/health", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+            }
         }
     }
 }

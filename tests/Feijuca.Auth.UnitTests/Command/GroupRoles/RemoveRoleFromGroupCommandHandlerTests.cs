@@ -1,13 +1,12 @@
 ﻿using AutoFixture;
 using Feijuca.Auth.Application.Commands.GroupRoles;
 using Feijuca.Auth.Common.Errors;
-using Feijuca.Auth.Models;
 using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Domain.Interfaces;
+using Feijuca.Auth.Models;
+using Feijuca.Auth.Providers;
 using FluentAssertions;
 using Moq;
-using Feijuca.Auth.Providers;
-using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Api.UnitTests.Command.GroupRoles
 {

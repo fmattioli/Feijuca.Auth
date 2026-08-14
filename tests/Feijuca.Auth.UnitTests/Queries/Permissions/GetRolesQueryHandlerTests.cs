@@ -6,7 +6,6 @@ using Feijuca.Auth.Domain.Interfaces;
 using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using FluentAssertions;
-using Feijuca.Auth.Models;
 using Moq;
 
 namespace Feijuca.Auth.Api.UnitTests.Queries.Permissions

@@ -46,6 +46,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
 
         public async Task<Result<IEnumerable<Group>>> GetGroupByNameAsync(
             string? groupName,
+            string? tenant,
             CancellationToken cancellationToken)
         {
             var tokenDetailsResult = await _authRepository.GetAccessTokenAsync(cancellationToken);
@@ -58,7 +59,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantProvider.Tenant.Name)
+                .AppendPathSegment(tenant ?? _tenantProvider.Tenant.Name)
                 .AppendPathSegment("groups");
 
             if (!string.IsNullOrWhiteSpace(groupName))

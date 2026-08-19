@@ -1,5 +1,4 @@
 ﻿using Feijuca.Auth.Domain.Interfaces;
-using Feijuca.Auth.Http.Client;
 using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using LiteBus.Commands.Abstractions;
@@ -10,23 +9,22 @@ namespace Feijuca.Auth.Application.Commands.ClientRole;
 public class SyncClientRoleCommandHandler(ITenantProvider tenantProvider,
     IClientRepository clientRepository,
     IClientRoleRepository clientRoleRepository,
-    IFeijucaAuthClient feijucaAuthClient) : ICommandHandler<SyncClientRoleCommand, Result<bool>>
+    IRealmRepository realmRepository) : ICommandHandler<SyncClientRoleCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(SyncClientRoleCommand request, CancellationToken cancellationToken = default)
     {
+        var originTenant = tenantProvider.Tenant.Name;
         IEnumerable<string> targetTenants = request.SyncRoleRequest.TargetTenant != null ? [request.SyncRoleRequest.TargetTenant] : [];
 
         if (request.SyncRoleRequest.AllTenants)
         {
-            var token = tenantProvider.GetToken();
-            var realms = (await feijucaAuthClient.GetRealmsAsync(token, cancellationToken)).Data;
+            var realms = await realmRepository.GetAllAsync(cancellationToken);
 
-            targetTenants = realms.Select(r => r.Realm).Where(r => r != tenantProvider.Tenant.Name);
+            targetTenants = realms.Select(r => r.Realm).Where(r => r != originTenant);
         }
 
         foreach (var targetTenant in targetTenants)
         {
-            var originTenant = tenantProvider.Tenant.Name;
             var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
 
             var clientsInTargetRealm = (await clientRepository.GetClientsAsync(targetTenant, cancellationToken)).Data;

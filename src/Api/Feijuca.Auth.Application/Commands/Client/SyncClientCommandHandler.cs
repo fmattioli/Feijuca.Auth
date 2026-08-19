@@ -1,7 +1,6 @@
 ﻿using Feijuca.Auth.Common;
 using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Domain.Interfaces;
-using Feijuca.Auth.Http.Client;
 using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using LiteBus.Commands.Abstractions;
@@ -10,7 +9,7 @@ namespace Feijuca.Auth.Application.Commands.Client;
 
 public class SyncClientCommandHandler(ITenantProvider tenantProvider,
     IClientRepository clientRepository,
-    IFeijucaAuthClient feijucaAuthClient,
+    IRealmRepository realmRepository,
     IClientRoleRepository clientRoleRepository,
     IGroupRolesRepository groupRolesRepository,
     IGroupRepository groupRepository) : ICommandHandler<SyncClientCommand, Result>
@@ -22,8 +21,7 @@ public class SyncClientCommandHandler(ITenantProvider tenantProvider,
 
         if (request.SyncClientRequest.AllTenants)
         {
-            var token = tenantProvider.GetToken();
-            var realms = (await feijucaAuthClient.GetRealmsAsync(token, cancellationToken)).Data;
+            var realms = await realmRepository.GetAllAsync(cancellationToken);
 
             targetTenants = realms.Select(r => r.Realm).Where(r => r != originTenant);
         }

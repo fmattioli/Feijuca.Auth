@@ -76,7 +76,7 @@ namespace Feijuca.Auth.Api.Controllers
         /// A <see cref="StatusCodes.Status200OK"/> status code if the roles were successfully synchronized;
         /// otherwise, a <see cref="StatusCodes.Status400BadRequest"/> status code containing the error details.
         /// </returns>
-        [HttpPost]
+        [HttpPost("sync")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

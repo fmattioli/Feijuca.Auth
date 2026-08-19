@@ -74,7 +74,7 @@ public class ClientsController(ICommandMediator commandMediator, IQueryMediator 
     /// </returns>
     /// <param name="syncClientRequest">The body related to the client that will be synchronized.</param>
     /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> used to observe cancellation requests for the operation.</param>
-    [HttpPost("{targetTenant}/sync")]
+    [HttpPost("sync")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

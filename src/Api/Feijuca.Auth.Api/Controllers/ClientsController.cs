@@ -79,7 +79,7 @@ public class ClientsController(ICommandMediator commandMediator, IQueryMediator 
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [RequiredRole("Feijuca.ApiWriter")]
-    public async Task<IActionResult> SyncClient([FromRoute] SyncClientRequest syncClientRequest, CancellationToken cancellationToken)
+    public async Task<IActionResult> SyncClient([FromBody] SyncClientRequest syncClientRequest, CancellationToken cancellationToken)
     {
         var result = await commandMediator.SendAsync(new SyncClientCommand(syncClientRequest), cancellationToken);
 

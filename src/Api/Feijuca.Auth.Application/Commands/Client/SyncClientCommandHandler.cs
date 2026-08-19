@@ -9,6 +9,7 @@ namespace Feijuca.Auth.Application.Commands.Client;
 
 public class SyncClientCommandHandler(ITenantProvider tenantProvider,
     IClientRepository clientRepository,
+    IRealmRepository realmRepository,
     IClientRoleRepository clientRoleRepository,
     IGroupRolesRepository groupRolesRepository,
     IGroupRepository groupRepository) : ICommandHandler<SyncClientCommand, Result>
@@ -16,21 +17,33 @@ public class SyncClientCommandHandler(ITenantProvider tenantProvider,
     public async Task<Result> HandleAsync(SyncClientCommand request, CancellationToken cancellationToken = default)
     {
         var originTenant = tenantProvider.Tenant.Name;
+        IEnumerable<string> targetTenants = request.SyncClientRequest.TargetTenant != null ? [request.SyncClientRequest.TargetTenant] : [];
+
+        if (request.SyncClientRequest.AllTenants)
+        {
+            var realms = await realmRepository.GetAllAsync(cancellationToken);
+
+            targetTenants = realms.Select(r => r.Realm).Where(r => r != originTenant);
+        }
+
         var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
 
-        var adminGroupResult = await groupRepository.GetGroupByNameAsync(Constants.AdminGroupName, request.TargetTenant, cancellationToken);
-        var adminGroupId = adminGroupResult.Data!.FirstOrDefault()!.Id;
-
-        var clientsInTargetRealm = (await clientRepository.GetClientsAsync(request.TargetTenant, cancellationToken)).Data;
-
-        foreach (var client in originClients?.Data ?? [])
+        foreach (var targetTenant in targetTenants)
         {
-            if (!clientsInTargetRealm.Any(c => c.ClientId == client.ClientId))
-            {
-                var clientId = (await clientRepository.CreateClientAsync(client, request.TargetTenant, cancellationToken)).Data;
+            var adminGroupResult = await groupRepository.GetGroupByNameAsync(Constants.AdminGroupName, targetTenant, cancellationToken);
+            var adminGroupId = adminGroupResult.Data!.FirstOrDefault()!.Id;
 
-                await AssociatedRulesToTheClientAsync(request.TargetTenant, originTenant, client, clientId, cancellationToken);
-                await AssociateClientRulesToTheGroupAsync(request.TargetTenant, adminGroupId!, clientId, cancellationToken);
+            var clientsInTargetRealm = (await clientRepository.GetClientsAsync(targetTenant, cancellationToken)).Data;
+
+            foreach (var client in originClients?.Data ?? [])
+            {
+                if (!clientsInTargetRealm.Any(c => c.ClientId == client.ClientId))
+                {
+                    var clientId = (await clientRepository.CreateClientAsync(client, targetTenant, cancellationToken)).Data;
+
+                    await AssociatedRulesToTheClientAsync(targetTenant, originTenant, client, clientId, cancellationToken);
+                    await AssociateClientRulesToTheGroupAsync(targetTenant, adminGroupId!, clientId, cancellationToken);
+                }
             }
         }
 

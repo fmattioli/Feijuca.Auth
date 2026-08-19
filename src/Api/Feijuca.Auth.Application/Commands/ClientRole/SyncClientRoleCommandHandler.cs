@@ -1,39 +1,55 @@
 ﻿using Feijuca.Auth.Domain.Interfaces;
+using Feijuca.Auth.Http.Client;
 using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using LiteBus.Commands.Abstractions;
+using MongoDB.Driver;
 
 namespace Feijuca.Auth.Application.Commands.ClientRole;
 
 public class SyncClientRoleCommandHandler(ITenantProvider tenantProvider,
     IClientRepository clientRepository,
-    IClientRoleRepository clientRoleRepository) : ICommandHandler<SyncClientRoleCommand, Result<bool>>
+    IClientRoleRepository clientRoleRepository,
+    IFeijucaAuthClient feijucaAuthClient) : ICommandHandler<SyncClientRoleCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(SyncClientRoleCommand request, CancellationToken cancellationToken = default)
     {
-        var originTenant = tenantProvider.Tenant.Name;
-        var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
+        IEnumerable<string> targetTenants = request.SyncRoleRequest.TargetTenant != null ? [request.SyncRoleRequest.TargetTenant] : [];
 
-        var clientsInTargetRealm = (await clientRepository.GetClientsAsync(request.TargetTenant, cancellationToken)).Data;
-
-        foreach (var originClient in originClients?.Data ?? [])
+        if (request.SyncRoleRequest.AllTenants)
         {
-            var originClientRoles = (await clientRoleRepository.GetRolesForClientAsync(originClient.Id, originTenant, cancellationToken)).Data;
+            var token = tenantProvider.GetToken();
+            var realms = (await feijucaAuthClient.GetRealmsAsync(token, cancellationToken)).Data;
 
-            if (clientsInTargetRealm.Any(c => c.ClientId == originClient.ClientId))
+            targetTenants = realms.Select(r => r.Realm).Where(r => r != tenantProvider.Tenant.Name);
+        }
+
+        foreach (var targetTenant in targetTenants)
+        {
+            var originTenant = tenantProvider.Tenant.Name;
+            var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
+
+            var clientsInTargetRealm = (await clientRepository.GetClientsAsync(targetTenant, cancellationToken)).Data;
+
+            foreach (var originClient in originClients?.Data ?? [])
             {
-                var targetClient = clientsInTargetRealm.First(c => c.ClientId == originClient.ClientId);
-                var targetClientRoles = (await clientRoleRepository.GetRolesForClientAsync(targetClient.Id, request.TargetTenant, cancellationToken)).Data;
+                var originClientRoles = (await clientRoleRepository.GetRolesForClientAsync(originClient.Id, originTenant, cancellationToken)).Data;
 
-                foreach (var originClientRole in originClientRoles ?? [])
+                if (clientsInTargetRealm.Any(c => c.ClientId == originClient.ClientId))
                 {
-                    if (!targetClientRoles.Any(r => r.Name == originClientRole.Name))
+                    var targetClient = clientsInTargetRealm.First(c => c.ClientId == originClient.ClientId);
+                    var targetClientRoles = (await clientRoleRepository.GetRolesForClientAsync(targetClient.Id, targetTenant, cancellationToken)).Data;
+
+                    foreach (var originClientRole in originClientRoles ?? [])
                     {
-                        await clientRoleRepository.AddClientRoleAsync(targetClient.Id,
-                                originClientRole.Name,
-                                originClientRole?.Description ?? "",
-                                request.TargetTenant,
-                                cancellationToken);
+                        if (!targetClientRoles.Any(r => r.Name == originClientRole.Name))
+                        {
+                            await clientRoleRepository.AddClientRoleAsync(targetClient.Id,
+                                    originClientRole.Name,
+                                    originClientRole?.Description ?? "",
+                                    targetTenant,
+                                    cancellationToken);
+                        }
                     }
                 }
             }

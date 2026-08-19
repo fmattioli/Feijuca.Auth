@@ -70,7 +70,7 @@ namespace Feijuca.Auth.Api.Controllers
         /// <summary>
         /// Synchronizes the roles of a client with the specified target tenant.
         /// </summary>
-        /// <param name="targetTenant">The target tenant where the client roles will be synchronized.</param>
+        /// <param name="syncRoleRequest">The request object containing the synchronization details.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the operation.</param>
         /// <returns>
         /// A <see cref="StatusCodes.Status200OK"/> status code if the roles were successfully synchronized;
@@ -81,9 +81,9 @@ namespace Feijuca.Auth.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [RequiredRole("Feijuca.ApiWriter")]
-        public async Task<IActionResult> SyncClientRoles([FromBody] string targetTenant, CancellationToken cancellationToken)
+        public async Task<IActionResult> SyncClientRoles([FromBody] SyncRoleRequest syncRoleRequest, CancellationToken cancellationToken)
         {
-            var result = await commandMediator.SendAsync(new SyncClientRoleCommand(targetTenant), cancellationToken);
+            var result = await commandMediator.SendAsync(new SyncClientRoleCommand(syncRoleRequest), cancellationToken);
 
             if (result.IsSuccess)
             {

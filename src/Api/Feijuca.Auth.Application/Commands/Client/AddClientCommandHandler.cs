@@ -48,7 +48,7 @@ namespace Feijuca.Auth.Application.Commands.Client
                     if (!response.IsSuccess)
                     {
                         logger.LogError("Failed to create client in tenant: {Tenant}. Error: {Error}", tenant, response.Error);
-                        return Result.Failure(response.Error);
+                        continue;
                     }
 
                     logger.LogInformation("Creating client in tenant: {Tenant}", tenant);

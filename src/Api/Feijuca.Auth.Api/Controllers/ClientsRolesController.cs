@@ -54,9 +54,9 @@ namespace Feijuca.Auth.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [RequiredRole("Feijuca.ApiWriter")]
-        public async Task<IActionResult> AddRole([FromBody] AddClientRoleRequest addRoleRequest, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddRole([FromBody] AddClientRolesRequest addRolesRequest, CancellationToken cancellationToken)
         {
-            var result = await commandMediator.SendAsync(new AddClientRoleCommand([addRoleRequest]), cancellationToken);
+            var result = await commandMediator.SendAsync(new AddClientRoleCommand(addRolesRequest), cancellationToken);
 
             if (result.IsSuccess)
             {

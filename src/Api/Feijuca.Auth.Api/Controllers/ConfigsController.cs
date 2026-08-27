@@ -138,11 +138,12 @@ namespace Feijuca.Auth.Api.Controllers
             var addClientScopeToClientRequest = new AddClientScopeToClientRequest(feijucaClient.Id, clientScope.Id, false);
             var groupRequest = new AddGroupRequest(Constants.FeijucaGroupName, []);
 
-            var addRolesRequest = new List<AddClientRoleRequest>
-            {
+            var addRolesRequest = new AddClientRolesRequest(
+                [
                 new(feijucaClient.Id, Constants.FeijucaRoleReadName, "Role related to the action to read data on the realm."),
                 new(feijucaClient.Id, Constants.FeijucaRoleWriterName, "Role related to the action to write data on the realm.")
-            };
+                ],
+                false, null);
 
             var result2 = await ProcessActionsAsync(
                 async () => await commandMediator.SendAsync(new AddClientScopeToClientCommand(addClientScopeToClientRequest), cancellationToken),

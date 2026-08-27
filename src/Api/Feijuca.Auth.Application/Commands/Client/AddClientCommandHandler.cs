@@ -29,7 +29,9 @@ namespace Feijuca.Auth.Application.Commands.Client
             {
                 var realms = await realmRepository.GetAllAsync(cancellationToken);
 
-                var tenants = realms.Where(r => r.Realm != tenantService.Tenant.Name).Select(r => r.Realm);
+                var tenants = realms
+                    .Where(r => r.Realm != tenantService.Tenant.Name)
+                    .Select(r => r.Realm);
 
                 foreach (var tenant in tenants)
                 {

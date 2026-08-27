@@ -23,12 +23,10 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
             return Result<bool>.Failure(RoleErrors.AddRoleErrors);
         }
 
-        var result = await AddClientRoleAsync(request.AddClientRolesRequest.ClientRoles, tenantProvider.Tenant.Name, cancellationToken);
-
         if (request.AddClientRolesRequest.AllTenants)
         {
             var realms = await realmRepository.GetAllAsync(cancellationToken);
-            var tenants = realms.Where(r => r.Realm != tenantProvider.Tenant.Name).Select(r => r.Realm);
+            var tenants = realms.Select(r => r.Realm);
 
             foreach (var tenant in tenants)
             {
@@ -44,6 +42,8 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
 
             return Result<bool>.Success(true);
         }
+
+        var result = await AddClientRoleAsync(request.AddClientRolesRequest.ClientRoles, tenantProvider.Tenant.Name, cancellationToken);
 
         return result;
     }

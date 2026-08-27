@@ -17,11 +17,19 @@ namespace Feijuca.Auth.Application.Commands.Client
         {
             var client = request.AddClientRequest.ToClientEntity();
 
+            var result = await clientRepository.CreateClientAsync(client, tenantService.Tenant.Name, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                logger.LogError("Failed to create client in tenant: {Tenant}. Error: {Error}", tenantService.Tenant.Name, result.Error);
+                return Result.Failure(result.Error);
+            }
+
             if (request.AddClientRequest.AllTenants)
             {
                 var realms = await realmRepository.GetAllAsync(cancellationToken);
 
-                var tenants = realms.Select(r => r.Realm);
+                var tenants = realms.Where(r => r.Realm != tenantService.Tenant.Name).Select(r => r.Realm);
 
                 foreach (var tenant in tenants)
                 {
@@ -45,14 +53,6 @@ namespace Feijuca.Auth.Application.Commands.Client
                 }
 
                 return Result.Success();
-            }
-
-            var result = await clientRepository.CreateClientAsync(client, tenantService.Tenant.Name, cancellationToken);
-
-            if (!result.IsSuccess)
-            {
-                logger.LogError("Failed to create client in tenant: {Tenant}. Error: {Error}", tenantService.Tenant.Name, result.Error);
-                return Result.Failure(result.Error);
             }
 
             logger.LogInformation("Creating client in tenant: {Tenant}", tenantService.Tenant.Name);

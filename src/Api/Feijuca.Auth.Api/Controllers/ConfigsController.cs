@@ -143,7 +143,7 @@ namespace Feijuca.Auth.Api.Controllers
                 new(feijucaClient.Id, Constants.FeijucaRoleReadName, "Role related to the action to read data on the realm."),
                 new(feijucaClient.Id, Constants.FeijucaRoleWriterName, "Role related to the action to write data on the realm.")
                 ],
-                false, null);
+                false);
 
             var result2 = await ProcessActionsAsync(
                 async () => await commandMediator.SendAsync(new AddClientScopeToClientCommand(addClientScopeToClientRequest), cancellationToken),

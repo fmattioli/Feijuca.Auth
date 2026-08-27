@@ -23,10 +23,10 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
             return Result<bool>.Failure(RoleErrors.AddRoleErrors);
         }
 
-        if (request.AddClientRolesRequest.AllTenants || !string.IsNullOrEmpty(request.AddClientRolesRequest.TargetTenant))
+        if (request.AddClientRolesRequest.AllTenants)
         {
             var realms = await realmRepository.GetAllAsync(cancellationToken);
-            var tenants = request.AddClientRolesRequest.AllTenants ? realms.Select(r => r.Realm) : [request.AddClientRolesRequest.TargetTenant ?? string.Empty];
+            var tenants = realms.Select(r => r.Realm);
 
             foreach (var tenant in tenants)
             {

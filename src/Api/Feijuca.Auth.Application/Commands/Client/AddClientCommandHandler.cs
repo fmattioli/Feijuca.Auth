@@ -17,11 +17,11 @@ namespace Feijuca.Auth.Application.Commands.Client
         {
             var client = request.AddClientRequest.ToClientEntity();
 
-            if (request.AddClientRequest.AllTenants || !string.IsNullOrEmpty(request.AddClientRequest.TargetTenant))
+            if (request.AddClientRequest.AllTenants)
             {
                 var realms = await realmRepository.GetAllAsync(cancellationToken);
 
-                var tenants = request.AddClientRequest.AllTenants ? realms.Select(r => r.Realm) : [tenantService.Tenant.Name, request.AddClientRequest.TargetTenant ?? string.Empty];
+                var tenants = realms.Select(r => r.Realm);
 
                 foreach (var tenant in tenants)
                 {

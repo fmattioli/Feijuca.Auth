@@ -14,6 +14,7 @@ public class SyncClientRoleCommandHandler(ITenantProvider tenantProvider,
     public async Task<Result<bool>> HandleAsync(SyncClientRoleCommand request, CancellationToken cancellationToken = default)
     {
         var originTenant = tenantProvider.Tenant.Name;
+        var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
         IEnumerable<string> targetTenants = request.SyncRoleRequest.TargetTenant != null ? [request.SyncRoleRequest.TargetTenant] : [];
 
         if (request.SyncRoleRequest.AllTenants)
@@ -25,8 +26,6 @@ public class SyncClientRoleCommandHandler(ITenantProvider tenantProvider,
 
         foreach (var targetTenant in targetTenants)
         {
-            var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
-
             var clientsInTargetRealm = (await clientRepository.GetClientsAsync(targetTenant, cancellationToken)).Data;
 
             foreach (var originClient in originClients?.Data ?? [])

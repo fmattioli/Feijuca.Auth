@@ -5,6 +5,7 @@ using Feijuca.Auth.Domain.Interfaces;
 using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Feijuca.Auth.Api.UnitTests.Command.Roles
@@ -13,12 +14,17 @@ namespace Feijuca.Auth.Api.UnitTests.Command.Roles
     {
         private readonly IFixture _fixture = new Fixture();
         private readonly Mock<IClientRoleRepository> _roleRepositoryMock = new();
+        private readonly Mock<IRealmRepository> _realmRepositoryMock = new();
         private readonly Mock<ITenantProvider> _tenantProviderMock = new();
+        private readonly Mock<ILogger<AddClientRoleCommandHandler>> _loggerMock = new();
         private readonly AddClientRoleCommandHandler _handler;
 
         public AddClientRoleCommandHandlerTests()
         {
-            _handler = new AddClientRoleCommandHandler(_roleRepositoryMock.Object, _tenantProviderMock.Object);
+            _handler = new AddClientRoleCommandHandler(_roleRepositoryMock.Object,
+                _realmRepositoryMock.Object,
+                _tenantProviderMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]

@@ -38,7 +38,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         if (!string.IsNullOrEmpty(jwtToken))
         {
             var tokenInfos = jwtSecurityTokenHandler.ReadJwtToken(jwtToken);
-            var userClaims = tokenInfos.Claims.Where(c => c.Type == "groups").Select(c => c.Value);
+            var userClaims = tokenInfos.Claims.Where(c => c.Type == "groups").Select(c => c.Value.Trim('/'));
             return userClaims;
         }
 

@@ -43,7 +43,7 @@ namespace Feijuca.Auth.Api.Controllers
         /// <summary>
         /// Adds a new role to a client in the specified Keycloak realm.
         /// </summary>
-        /// <param name="addRoleRequest">The request object containing the details of the role to be added.</param>
+        /// <param name="addRolesRequest">The request object containing the details of the role to be added.</param>
         /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
         /// <returns>
         /// A 201 Created status code if the role was successfully added;
@@ -54,9 +54,9 @@ namespace Feijuca.Auth.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [RequiredRole("Feijuca.ApiWriter")]
-        public async Task<IActionResult> AddRole([FromBody] AddClientRoleRequest addRoleRequest, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddRole([FromBody] AddClientRolesRequest addRolesRequest, CancellationToken cancellationToken)
         {
-            var result = await commandMediator.SendAsync(new AddClientRoleCommand([addRoleRequest]), cancellationToken);
+            var result = await commandMediator.SendAsync(new AddClientRoleCommand(addRolesRequest), cancellationToken);
 
             if (result.IsSuccess)
             {

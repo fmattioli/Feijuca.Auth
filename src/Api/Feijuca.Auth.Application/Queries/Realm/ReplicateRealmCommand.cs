@@ -1,6 +1,6 @@
-﻿using Feijuca.Auth.Application.Requests.Realm;
-using LiteBus.Commands.Abstractions;
+﻿using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Models;
+using LiteBus.Commands.Abstractions;
 
 namespace Feijuca.Auth.Application.Queries.Realm
 {

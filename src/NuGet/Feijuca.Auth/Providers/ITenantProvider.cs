@@ -18,7 +18,11 @@ public interface ITenantProvider
 
     Tenant GetTenant();
 
+    Tenant? GetRequestedTenant();
+
     void SetTenant(Tenant tenant);
+
+    void SetRequestedTenant(string tenant);
 
     User GetUser();
 

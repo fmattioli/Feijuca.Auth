@@ -1,28 +1,31 @@
-﻿using MongoDB.Bson;
+﻿using Feijuca.Auth.Providers;
+using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Text.RegularExpressions;
 
 namespace Feijuca.Auth.Stages;
 
 public static class TenantStageFilter
 {
-    public static FilterDefinition<BsonDocument> MatchByTenants(IEnumerable<string> tenantNames)
+    public static FilterDefinition<BsonDocument> MatchByContext(ITenantProvider tenantProvider)
     {
-        var names = tenantNames.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase)));
+        var requestedTenant = tenantProvider.GetRequestedTenant();
 
-        var filter = new BsonDocument(
-            "Tenants",
-            new BsonDocument("$in", BsonArray.Create(names)));
-
-        return new BsonDocumentFilterDefinition<BsonDocument>(filter);
+        return requestedTenant is not null
+            ? MatchByVisibleToTenants(requestedTenant.Name)
+            : MatchByTenant(tenantProvider.GetTenant().Name);
     }
 
     public static FilterDefinition<BsonDocument> MatchByTenant(string tenant)
     {
-        var filter = new BsonDocument(
+        return Builders<BsonDocument>.Filter.Eq(
             "Tenant",
-            new BsonDocument("$eq", tenant));
+            tenant);
+    }
 
-        return new BsonDocumentFilterDefinition<BsonDocument>(filter);
+    public static FilterDefinition<BsonDocument> MatchByVisibleToTenants(string tenant)
+    {
+        return Builders<BsonDocument>.Filter.AnyEq(
+            "VisibleToTenants",
+            tenant);
     }
 }

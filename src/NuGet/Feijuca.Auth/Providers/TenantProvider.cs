@@ -10,6 +10,8 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     private Tenant _tenant = null!;
 
+    private Tenant _requestedTenant = null!;
+
     private IEnumerable<Tenant> _tenants = [];
 
     public User User => _userId;
@@ -42,7 +44,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
             return userClaims;
         }
 
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     public User GetUser()
@@ -69,6 +71,11 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         }
 
         return authorizationHeader["Bearer ".Length..];
+    }
+
+    public void SetRequestedTenant(string tenant)
+    {
+        _requestedTenant = new Tenant(tenant);
     }
 
     public void SetTenants(IEnumerable<Tenant> tenants)
@@ -98,6 +105,12 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         }
 
         return new Tenant("Invalid tenant");
+    }
+
+
+    public Tenant? GetRequestedTenant()
+    {
+        return _requestedTenant;
     }
 
     public IEnumerable<Tenant> GetTenants()

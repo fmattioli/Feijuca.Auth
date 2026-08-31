@@ -10,7 +10,7 @@ public static class TenantStageFilter
     {
         var requestedTenant = tenantProvider.GetRequestedTenant();
 
-        return requestedTenant is not null
+        return !string.IsNullOrWhiteSpace(requestedTenant?.Name)
             ? MatchByVisibleToTenants(requestedTenant.Name)
             : MatchByTenant(tenantProvider.GetTenant().Name);
     }

@@ -11,8 +11,8 @@ public static class TenantStageFilter
         var requestedTenant = tenantProvider.GetRequestedTenant();
 
         return !string.IsNullOrWhiteSpace(requestedTenant?.Name)
-            ? MatchByVisibleToTenants(requestedTenant.Name)
-            : MatchByTenant(tenantProvider.GetTenant().Name);
+            ? MatchByVisibleToTenants(requestedTenant.Name, tenantProvider.Tenant.Name)
+            : MatchByTenant(tenantProvider.Tenant.Name);
     }
 
     public static FilterDefinition<BsonDocument> MatchByTenant(string tenant)
@@ -22,10 +22,18 @@ public static class TenantStageFilter
             tenant);
     }
 
-    public static FilterDefinition<BsonDocument> MatchByVisibleToTenants(string tenant)
+    public static FilterDefinition<BsonDocument> MatchByVisibleToTenants(string requestedTenant, string visibleToTenant)
     {
-        return Builders<BsonDocument>.Filter.AnyEq(
+        var requestTenantFilter = Builders<BsonDocument>.Filter.Eq(
+            "Tenant",
+            requestedTenant);
+
+        var visibleToTenantsFilter = Builders<BsonDocument>.Filter.AnyEq(
             "VisibleToTenants",
-            tenant);
+            visibleToTenant);
+
+        return Builders<BsonDocument>.Filter.And(
+            requestTenantFilter,
+            visibleToTenantsFilter);
     }
 }

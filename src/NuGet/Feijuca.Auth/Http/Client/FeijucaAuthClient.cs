@@ -3,7 +3,6 @@ using Feijuca.Auth.Http.BaseHttp;
 using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Http.Responses;
 using Feijuca.Auth.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;

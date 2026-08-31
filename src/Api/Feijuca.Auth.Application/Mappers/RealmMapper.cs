@@ -1,6 +1,6 @@
-﻿using Feijuca.Auth.Application.Requests.Realm;
-using Feijuca.Auth.Application.Responses;
+﻿using Feijuca.Auth.Application.Responses;
 using Feijuca.Auth.Domain.Entities;
+using Feijuca.Auth.Http.Requests;
 using Flurl;
 
 namespace Feijuca.Auth.Application.Mappers

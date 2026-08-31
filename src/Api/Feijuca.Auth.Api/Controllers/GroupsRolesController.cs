@@ -7,6 +7,7 @@ using LiteBus.Queries.Abstractions;
 using Feijuca.Auth.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Feijuca.Auth.Http.Requests;
 
 namespace Feijuca.Auth.Api.Controllers
 {

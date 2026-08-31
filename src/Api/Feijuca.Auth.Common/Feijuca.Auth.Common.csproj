@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Flurl" Version="4.0.0" />
-    <PackageReference Include="Feijuca.Auth" Version="1.75.2" />
+    <PackageReference Include="Feijuca.Auth" Version="1.76.1" />
   </ItemGroup>
 
 </Project>

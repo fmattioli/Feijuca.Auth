@@ -104,7 +104,14 @@ namespace Feijuca.Auth.Http.Client
 
         public async Task<Result<bool>> ReplicateRealmAsync(ReplicateRealmRequest request, CancellationToken cancellationToken)
         {
+            var result = await PostAsync<ReplicateRealmRequest, bool>("realms/replicate", request, cancellationToken);
 
+            if (!result)
+            {
+                return Result<bool>.Failure(FeijucaErrors.ReplicateRealmError);
+            }
+
+            return Result<bool>.Success(result);
         }
 
         /// <summary>

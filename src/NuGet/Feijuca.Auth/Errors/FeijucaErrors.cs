@@ -13,4 +13,5 @@ public static class FeijucaErrors
     public static readonly Error CreateUserError = new("CreateUserError", "An error occured while create new group");
     public static readonly Error AddUserToGroupError = new("AddUserToGroupError", "An error occured while to add user in group");
     public static readonly Error UpdateGroupNameError = new("UpdateGroupNameError", "An error occured while updating group name.");
+    public static readonly Error ReplicateRealmError = new("ReplicateRealmError", "An error occured while replicating realm.");
 }

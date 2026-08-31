@@ -62,6 +62,32 @@ public class BaseHttpClient(HttpClient httpClient)
         return result!;
     }
 
+    protected async Task<TResponse> DeleteAsync<TRequest, TResponse>(
+    string path,
+    TRequest request,
+    CancellationToken cancellationToken)
+    where TRequest : class
+    {
+        var url = _httpClient.BaseAddress!.AppendPathSegment(path);
+
+        string json = JsonConvert.SerializeObject(request);
+
+        StringContent bodyContent = new(json, Encoding.UTF8, "application/json");
+
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Delete, url)
+        {
+            Content = bodyContent
+        };
+
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        return JsonConvert.DeserializeObject<TResponse>(content)!;
+    }
+
     protected async Task<TResponse> PostAsync<TRequest, TResponse>(
         string path,
         TRequest request,

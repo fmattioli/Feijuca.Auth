@@ -3,6 +3,7 @@ using Feijuca.Auth.Http.BaseHttp;
 using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Http.Responses;
 using Feijuca.Auth.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -78,6 +79,18 @@ namespace Feijuca.Auth.Http.Client
             return Result<IEnumerable<GroupResponse>>.Success(result);
         }
 
+        public async Task<Result> RemoveUsersFromGroupAsync(RemoveUserFromGroupRequest removeUserFromGroupRequest, CancellationToken cancellationToken)
+        {
+            var result = await DeleteAsync<RemoveUserFromGroupRequest, bool>("groups/users", removeUserFromGroupRequest, cancellationToken);
+
+            if (!result)
+            {
+                return Result.Failure(FeijucaErrors.RemoveUsersFromGroupError);
+            }
+
+            return Result.Success();
+        }
+
         public async Task<Result<PagedResult<UserGroupResponse>>> GetGroupUsersAsync(string groupId, string jwtToken, CancellationToken cancellationToken)
         {
             var result = await GetAsync<PagedResult<UserGroupResponse>>($"groups/users?groupId={groupId}", jwtToken, cancellationToken);
@@ -100,6 +113,18 @@ namespace Feijuca.Auth.Http.Client
             }
 
             return Result<IEnumerable<RealmResponse>>.Success(result);
+        }
+
+        public async Task<Result> CreateRealmAsync(IEnumerable<AddRealmRequest> AddRealmsRequest, CancellationToken cancellationToken)
+        {
+            var result = await _httpClient.PostAsJsonAsync("realms", AddRealmsRequest, cancellationToken);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                return Result.Failure(FeijucaErrors.CreateRealmError);
+            }
+
+            return Result.Success();
         }
 
         public async Task<Result> ReplicateRealmAsync(ReplicateRealmRequest request, CancellationToken cancellationToken)

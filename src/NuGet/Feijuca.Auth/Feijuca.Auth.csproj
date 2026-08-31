@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/fmattioli/Feijuca.Auth</RepositoryUrl>
     <PackageTags>keycloak, authorization, auth, jwt</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.76.1</Version>
+    <Version>1.77.0</Version>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

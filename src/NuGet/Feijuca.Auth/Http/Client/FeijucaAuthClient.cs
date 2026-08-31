@@ -102,6 +102,11 @@ namespace Feijuca.Auth.Http.Client
             return Result<IEnumerable<RealmResponse>>.Success(result);
         }
 
+        public async Task<Result<bool>> ReplicateRealmAsync(ReplicateRealmRequest request, CancellationToken cancellationToken)
+        {
+
+        }
+
         /// <summary>
         /// Creates a new group in the authentication service.
         /// </summary>

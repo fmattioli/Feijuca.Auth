@@ -18,6 +18,8 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     public Tenant Tenant => _tenant;
 
+    public Tenant RequestedTenant => _requestedTenant;
+
     public IEnumerable<Tenant> Tenants => _tenants;
 
     public string GetInfo(string infoName)

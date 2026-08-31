@@ -15,10 +15,7 @@ public class UpdateRealmAttributesCommandHandler(IRealmRepository realmRepositor
 
         foreach (var newAttribute in command.UpdateRealmAttributesRequest.Attributes)
         {
-            if (oldAttributesUpdated.TryGetValue(newAttribute.Key, out string? _))
-            {
-                oldAttributesUpdated[newAttribute.Key] = newAttribute.Value;
-            }
+            oldAttributesUpdated[newAttribute.Key] = newAttribute.Value;
         }
 
         realm.Data.Attributes = oldAttributesUpdated;

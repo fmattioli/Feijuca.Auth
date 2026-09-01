@@ -17,7 +17,7 @@ public interface IFeijucaAuthClient
     Task<Result<Guid>> CreateUserAsync(CreateUserRequest request, string tenant, CancellationToken cancellationToken);
     Task<Result> AddUserToGroupAsync(AddUserToGroupRequest request, CancellationToken cancellationToken);
     Task<Result> ReplicateRealmAsync(ReplicateRealmRequest request, CancellationToken cancellationToken);
-    Task<Result> CreateRealmAsync(AddRealmRequest AddRealmsRequest, CancellationToken cancellationToken);
+    Task<Result> CreateRealmAsync(AddRealmRequest addRealmRequest, CancellationToken cancellationToken);
     Task<Result> UpdateGroupNameAsync(Guid groupId, UpdateGroupNameRequest request, CancellationToken cancellationToken);
     void SetToken(string token);
 }

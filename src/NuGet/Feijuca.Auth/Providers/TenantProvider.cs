@@ -97,7 +97,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
             return new Tenant(tenantClaim);
         }
 
-        return new Tenant("Invalid tenant");
+        return new Tenant(string.Empty);
     }
 
     public IEnumerable<Tenant> GetTenants()

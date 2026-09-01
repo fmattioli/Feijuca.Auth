@@ -115,6 +115,16 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         return _requestedTenant;
     }
 
+    public Tenant GetTenantContext()
+    {
+        if (!string.IsNullOrWhiteSpace(_requestedTenant?.Name))
+        {
+            return _requestedTenant;
+        }
+
+        return _tenant;
+    }
+
     public IEnumerable<Tenant> GetTenants()
     {
         string jwtToken = GetToken();

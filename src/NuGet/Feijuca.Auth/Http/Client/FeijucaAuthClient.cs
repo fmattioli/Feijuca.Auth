@@ -114,9 +114,9 @@ namespace Feijuca.Auth.Http.Client
             return Result<IEnumerable<RealmResponse>>.Success(result);
         }
 
-        public async Task<Result> CreateRealmAsync(IEnumerable<AddRealmRequest> AddRealmsRequest, CancellationToken cancellationToken)
+        public async Task<Result> CreateRealmAsync(AddRealmRequest addRealmRequest, CancellationToken cancellationToken)
         {
-            var result = await _httpClient.PostAsJsonAsync("realms", AddRealmsRequest, cancellationToken);
+            var result = await _httpClient.PostAsJsonAsync("realms", addRealmRequest, cancellationToken);
 
             if (!result.IsSuccessStatusCode)
             {

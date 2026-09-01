@@ -64,11 +64,9 @@ namespace Feijuca.Auth.Http.Client
             return Result<PagedResult<UserResponse>>.Success(result);
         }
 
-        public async Task<Result<IEnumerable<GroupResponse>>> GetGroupsAsync(string tenant, string jwtToken, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<GroupResponse>>> GetGroupsAsync(CancellationToken cancellationToken)
         {
-            IncludeTenantHeader(tenant);
-
-            var result = await GetAsync<IEnumerable<GroupResponse>>("groups", jwtToken, cancellationToken);
+            var result = await GetAsync<IEnumerable<GroupResponse>>("groups", cancellationToken);
 
             if (!result.Any())
             {
@@ -203,6 +201,22 @@ namespace Feijuca.Auth.Http.Client
             if(!string.IsNullOrEmpty(jwtToken))
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+            }
+        }
+
+        /// <summary>
+        /// Sets the headers used in requests.
+        /// </summary>
+        /// <param name="headers">Headers to be included in the requests.</param>
+        public void SetHeaders(params (string Name, string Value)[] headers)
+        {
+            foreach (var (name, value) in headers)
+            {
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(value))
+                {
+                    _httpClient.DefaultRequestHeaders.Remove(name);
+                    _httpClient.DefaultRequestHeaders.Add(name, value);
+                }
             }
         }
 

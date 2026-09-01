@@ -20,6 +20,8 @@ public interface ITenantProvider
 
     Tenant? GetRequestedTenant();
 
+    Tenant GetTenantContext();
+
     void SetTenant(Tenant tenant);
 
     void SetRequestedTenant(string tenant);

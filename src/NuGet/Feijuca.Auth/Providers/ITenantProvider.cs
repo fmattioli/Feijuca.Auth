@@ -22,7 +22,7 @@ public interface ITenantProvider
 
     Tenant GetTenantContext();
 
-    void SetTenant(Tenant tenant);
+    void SetTenant(string tenant);
 
     void SetRequestedTenant(string tenant);
 

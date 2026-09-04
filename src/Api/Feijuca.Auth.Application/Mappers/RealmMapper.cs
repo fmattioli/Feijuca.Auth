@@ -40,13 +40,33 @@ namespace Feijuca.Auth.Application.Mappers
 
         public static RealmEntity ToUpdateSettings(this RealmEntity realm, UpdateRealmSettingsRequest request)
         {
-            realm.AccessTokenLifespan = request.AccessTokenLifespan ?? realm.AccessTokenLifespan;
-            realm.AccessTokenLifespanForImplicitFlow = request.AccessTokenLifespanForImplicitFlow ?? realm.AccessTokenLifespanForImplicitFlow;
-            realm.SsoSessionIdleTimeout = request.SsoSessionIdleTimeout ?? realm.SsoSessionIdleTimeout;
-            realm.SsoSessionMaxLifespan = request.SsoSessionMaxLifespan ?? realm.SsoSessionMaxLifespan;
-            realm.OfflineSessionIdleTimeout = request.OfflineSessionIdleTimeout ?? realm.OfflineSessionIdleTimeout;
-            realm.OfflineSessionMaxLifespan = request.OfflineSessionMaxLifespan ?? realm.OfflineSessionMaxLifespan;
-            return realm;
+            var newRealm = realm;
+
+            newRealm.AccessTokenLifespan = (int)(request.AccessTokenLifespanFromHours.HasValue
+                ? TimeSpan.FromHours(request.AccessTokenLifespanFromHours.Value).TotalSeconds 
+                : realm.AccessTokenLifespan);
+
+            newRealm.AccessTokenLifespanForImplicitFlow = (int)(request.AccessTokenLifespanForImplicitFlowFromMinutes.HasValue
+                ? TimeSpan.FromMinutes(request.AccessTokenLifespanForImplicitFlowFromMinutes.Value).TotalSeconds
+                : realm.AccessTokenLifespanForImplicitFlow);
+
+            newRealm.SsoSessionIdleTimeout = (int)(request.SsoSessionIdleTimeoutFromMinutes.HasValue
+                ? TimeSpan.FromMinutes(request.SsoSessionIdleTimeoutFromMinutes.Value).TotalSeconds
+                : realm.SsoSessionIdleTimeout);
+
+            newRealm.SsoSessionMaxLifespan = (int)(request.SsoSessionMaxLifespanFromHours.HasValue
+                ? TimeSpan.FromHours(request.SsoSessionMaxLifespanFromHours.Value).TotalSeconds
+                : realm.SsoSessionMaxLifespan);
+
+            newRealm.OfflineSessionIdleTimeout = (int)(request.OfflineSessionIdleTimeoutFromDays.HasValue
+                ? TimeSpan.FromDays(request.OfflineSessionIdleTimeoutFromDays.Value).TotalSeconds
+                : realm.OfflineSessionIdleTimeout);
+
+            newRealm.OfflineSessionMaxLifespan = (int)(request.OfflineSessionMaxLifespanFromDays.HasValue
+                ? TimeSpan.FromDays(request.OfflineSessionMaxLifespanFromDays.Value).TotalSeconds
+                : realm.OfflineSessionMaxLifespan);
+
+            return newRealm;
         }
     }
 }

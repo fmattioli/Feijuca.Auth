@@ -76,7 +76,13 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             {
                 realm = realm.Realm,
                 enabled = realm.Enabled,
-                displayName = realm.DisplayName
+                displayName = realm.DisplayName,
+                accessTokenLifespan = realm.AccessTokenLifespan,
+                accessTokenLifespanForImplicitFlow = realm.AccessTokenLifespanForImplicitFlow,
+                ssoSessionIdleTimeout = realm.SsoSessionIdleTimeout,
+                ssoSessionMaxLifespan = realm.SsoSessionMaxLifespan,
+                offlineSessionIdleTimeout = realm.OfflineSessionIdleTimeout,
+                offlineSessionMaxLifespan = realm.OfflineSessionMaxLifespan
             };
 
             var jsonContent = JsonConvert.SerializeObject(realmBody);

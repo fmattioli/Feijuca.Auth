@@ -103,4 +103,30 @@ public class RealmsController(ICommandMediator commandMediator, IQueryMediator q
 
         return BadRequest(result.Error);
     }
+
+    /// <summary>
+    /// Update the settings of an existing realm on Keycloak
+    /// </summary>
+    /// <returns>
+    /// A 200 OK status code meaning that the realm settings were updated successfully;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
+    /// <param name="realm">The name of the realm.</param>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    public async Task<IActionResult> UpdateRealmSettings([FromBody] UpdateRealmSettingsRequest realm, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new UpdateRealmSettingsCommand(realm), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+
+        return BadRequest(result.Error);
+    }
 }

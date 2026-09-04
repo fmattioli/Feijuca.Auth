@@ -104,6 +104,7 @@ namespace Feijuca.Auth.Application.Queries.Realm
 
         private async Task<bool> ReplicateRealmAttributesAsync(string targetTenant, CancellationToken cancellationToken)
         {
+            var originRealm = await realmRepository.GetAsync(tenantProvider.Tenant.Name, cancellationToken);
             var targetRealm = await realmRepository.GetAsync(targetTenant, cancellationToken);
             if (!targetRealm.IsSuccess)
             {
@@ -117,6 +118,12 @@ namespace Feijuca.Auth.Application.Queries.Realm
             }
 
             targetRealm.Data.Attributes = attributes;
+            targetRealm.Data.AccessTokenLifespan = originRealm.Data.AccessTokenLifespan;
+            targetRealm.Data.AccessTokenLifespanForImplicitFlow = originRealm.Data.AccessTokenLifespanForImplicitFlow;
+            targetRealm.Data.SsoSessionIdleTimeout = originRealm.Data.SsoSessionIdleTimeout;
+            targetRealm.Data.SsoSessionMaxLifespan = originRealm.Data.SsoSessionMaxLifespan;
+            targetRealm.Data.OfflineSessionIdleTimeout = originRealm.Data.OfflineSessionIdleTimeout;
+            targetRealm.Data.OfflineSessionMaxLifespan = originRealm.Data.OfflineSessionMaxLifespan;
 
             var updateResult = await realmRepository.UpdateRealmAsync(targetTenant, targetRealm.Data, cancellationToken);
 

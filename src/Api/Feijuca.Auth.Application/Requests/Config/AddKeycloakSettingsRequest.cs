@@ -1,4 +1,4 @@
-﻿using Feijuca.Auth.Application.Requests.Auth;
+﻿using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Application.Requests.Config

@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using Feijuca.Auth.Application.Requests.Auth;
 using Feijuca.Auth.Application.Validators;
+using Feijuca.Auth.Http.Requests;
 using FluentAssertions;
 
 namespace Feijuca.Auth.Api.UnitTests.Validators

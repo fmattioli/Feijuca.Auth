@@ -3,6 +3,7 @@ using Feijuca.Auth.Application.Queries.Users;
 using Feijuca.Auth.Application.Requests.Auth;
 using Feijuca.Auth.Application.Requests.User;
 using Feijuca.Auth.Attributes;
+using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Http.Responses;
 using Feijuca.Auth.Models;
 using LiteBus.Commands.Abstractions;

@@ -1,5 +1,4 @@
-﻿using Feijuca.Auth.Application.Requests.Auth;
-using Feijuca.Auth.Http.Requests;
+﻿using Feijuca.Auth.Http.Requests;
 using FluentValidation;
 
 namespace Feijuca.Auth.Application.Validators

@@ -1,13 +1,10 @@
-﻿using Feijuca.Auth.Application.Requests.Auth;
-using Feijuca.Auth.Application.Requests.GroupUsers;
-using Feijuca.Auth.Application.Requests.Pagination;
-using Feijuca.Auth.Application.Responses;
+﻿using Feijuca.Auth.Application.Requests.GroupUsers;
+using Feijuca.Auth.Application.Requests.User;
 using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Domain.Filters;
+using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Http.Responses;
 using Feijuca.Auth.Models;
-using Feijuca.Auth.Application.Requests.User;
-using Feijuca.Auth.Http.Requests;
 
 namespace Feijuca.Auth.Application.Mappers
 {
@@ -89,7 +86,7 @@ namespace Feijuca.Auth.Application.Mappers
             return new UserFilters(pageFilter, [], getUsersRequest.Usernames);
         }
 
-        public static Responses.PagedResult<UserResponse> ToUserResponse(this IEnumerable<Domain.Entities.User> results, Feijuca.Auth.Application.Requests.Pagination.PageFilterRequest pageFilter, string tenant, int totalResults)
+        public static Responses.PagedResult<UserResponse> ToUserResponse(this IEnumerable<Domain.Entities.User> results, PageFilterRequest pageFilter, string tenant, int totalResults)
         {
             return new Responses.PagedResult<UserResponse>
             {

@@ -1,8 +1,7 @@
-﻿using Feijuca.Auth.Common.Errors;
-using Feijuca.Auth.Domain.Interfaces;
+﻿using Feijuca.Auth.Domain.Interfaces;
+using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using LiteBus.Commands.Abstractions;
-using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Application.Commands.RealmAttributes;
 

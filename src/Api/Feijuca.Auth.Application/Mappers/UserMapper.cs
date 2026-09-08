@@ -86,7 +86,7 @@ namespace Feijuca.Auth.Application.Mappers
             return new UserFilters(pageFilter, [], getUsersRequest.Usernames);
         }
 
-        public static Responses.PagedResult<UserResponse> ToUserResponse(this IEnumerable<Domain.Entities.User> results, Feijuca.Auth.Application.Requests.Pagination.PageFilterRequest pageFilter, string tenant, int totalResults)
+        public static Responses.PagedResult<UserResponse> ToUserResponse(this IEnumerable<Domain.Entities.User> results, PageFilterRequest pageFilter, string tenant, int totalResults)
         {
             return new Responses.PagedResult<UserResponse>
             {

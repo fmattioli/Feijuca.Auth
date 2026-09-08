@@ -1,6 +1,6 @@
-﻿using Feijuca.Auth.Application.Requests.Pagination;
+﻿using Feijuca.Auth.Application.Responses;
 using Feijuca.Auth.Domain.Entities;
-using Feijuca.Auth.Application.Responses;
+using Feijuca.Auth.Http.Requests;
 
 namespace Feijuca.Auth.Application.Mappers
 {

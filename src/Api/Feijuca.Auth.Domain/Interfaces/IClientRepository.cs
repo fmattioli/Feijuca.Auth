@@ -1,6 +1,5 @@
 ﻿using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Models;
-using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Domain.Interfaces
 {

@@ -1,4 +1,4 @@
-using Feijuca.Auth.Application.Requests.Pagination;
+using Feijuca.Auth.Http.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feijuca.Auth.Application.Requests.User

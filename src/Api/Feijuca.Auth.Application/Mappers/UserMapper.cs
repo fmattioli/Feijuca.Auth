@@ -1,13 +1,10 @@
-﻿using Feijuca.Auth.Application.Requests.Auth;
-using Feijuca.Auth.Application.Requests.GroupUsers;
-using Feijuca.Auth.Application.Requests.Pagination;
-using Feijuca.Auth.Application.Responses;
+﻿using Feijuca.Auth.Application.Requests.GroupUsers;
+using Feijuca.Auth.Application.Requests.User;
 using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Domain.Filters;
+using Feijuca.Auth.Http.Requests;
 using Feijuca.Auth.Http.Responses;
 using Feijuca.Auth.Models;
-using Feijuca.Auth.Application.Requests.User;
-using Feijuca.Auth.Http.Requests;
 
 namespace Feijuca.Auth.Application.Mappers
 {

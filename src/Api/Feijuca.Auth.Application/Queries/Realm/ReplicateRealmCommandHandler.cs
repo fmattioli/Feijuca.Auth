@@ -101,12 +101,14 @@ namespace Feijuca.Auth.Application.Queries.Realm
 
             if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroups ?? false)
             {
-                var originGroups = (await groupRepository.GetAllAsync(cancellationToken)).Data;
+                var originGroups = (await groupRepository.GetAllAsync(cancellationToken)).Data
+                    .Where(x => x.Name != Constants.AdminGroupName);
 
                 foreach (var group in originGroups)
                 {
-                    var groupCreateId = await groupRepository.CreateAsync(group.Name, targetTenant, [], cancellationToken);
                     var roulesGroup = (await groupRolesRepository.GetGroupRolesAsync(group.Id, cancellationToken)).Data;
+                    var groupCreateId = await groupRepository.CreateAsync(group.Name, targetTenant, [], cancellationToken);
+                    
 
                     foreach (var role in roulesGroup)
                     {

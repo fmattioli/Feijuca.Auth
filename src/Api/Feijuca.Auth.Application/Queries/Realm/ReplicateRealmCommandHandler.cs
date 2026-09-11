@@ -104,16 +104,47 @@ namespace Feijuca.Auth.Application.Queries.Realm
                 var originGroups = (await groupRepository.GetAllAsync(cancellationToken)).Data
                     .Where(x => x.Name != Constants.AdminGroupName);
 
+                var clientsDestination = (await clientRepository.GetClientsAsync(targetTenant, cancellationToken)).Data;
+
                 foreach (var group in originGroups)
                 {
-                    var groupCreateId = await groupRepository.CreateAsync(group.Name, targetTenant, [], cancellationToken);
-                    var rolesAssociatedToGroup = (await groupRolesRepository.GetGroupRolesAsync(group.Id, cancellationToken)).Data;
+                    var groupCreateId = await groupRepository.CreateAsync(
+                        group.Name,
+                        targetTenant,
+                        [],
+                        cancellationToken);
 
-                    foreach (var roleAssociatedToGroup in rolesAssociatedToGroup)
+                    var rolesAssociatedToGroup = (await groupRolesRepository.GetGroupRolesAsync(
+                            group.Id,
+                            originTenant,
+                            cancellationToken)).Data;
+
+                    foreach (var clientMapping in rolesAssociatedToGroup)
                     {
-                        foreach (var role in rolesAssociatedToGroup.SelectMany(x => x.Mappings))
+                        var destinationClient = clientsDestination.FirstOrDefault(x => x.ClientId == clientMapping.Client);
+
+                        if (destinationClient is null)
+                            continue;
+
+                        var destinationRoles = (await clientRoleRepository.GetRolesForClientAsync(
+                                destinationClient.Id,
+                                targetTenant,
+                                cancellationToken)).Data;
+
+                        foreach (var sourceRole in clientMapping.Mappings)
                         {
-                            await groupRolesRepository.AddClientRoleToGroupAsync(groupCreateId.Data, roleAssociatedToGroup.Client, role.Id, role.Name, targetTenant, cancellationToken);
+                            var destinationRole = destinationRoles.FirstOrDefault(x => x.Name == sourceRole.Name);
+
+                            if (destinationRole is null)
+                                continue;
+
+                            await groupRolesRepository.AddClientRoleToGroupAsync(
+                                groupCreateId.Data,
+                                destinationClient.Id,
+                                destinationRole.Id,
+                                destinationRole.Name,
+                                targetTenant,
+                                cancellationToken);
                         }
                     }
                 }

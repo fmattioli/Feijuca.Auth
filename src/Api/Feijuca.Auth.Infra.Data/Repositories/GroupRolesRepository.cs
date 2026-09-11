@@ -49,10 +49,12 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 return Result<bool>.Success(true);
             }
 
+            var groupRolesContent = await response.Content.ReadAsStringAsync(cancellationToken);
+
             return Result<bool>.Failure(GroupRolesErrors.ErrorAddRoleToGroup);
         }
 
-        public async Task<Result<IEnumerable<ClientMapping>>> GetGroupRolesAsync(string groupId, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ClientMapping>>> GetGroupRolesAsync(string groupId, string tenant, CancellationToken cancellationToken)
         {
             var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
             using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
@@ -60,7 +62,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                     .AppendPathSegment("admin")
                     .AppendPathSegment("realms")
-                    .AppendPathSegment(_tenantService.Tenant.Name)
+                    .AppendPathSegment(tenant)
                     .AppendPathSegment("groups")
                     .AppendPathSegment(groupId)
                     .AppendPathSegment("role-mappings");

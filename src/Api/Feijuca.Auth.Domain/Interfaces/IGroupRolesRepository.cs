@@ -10,3 +10,4 @@ namespace Feijuca.Auth.Domain.Interfaces
         Task<Result> RemoveRoleFromGroupAsync(string clientId, string groupId, Guid roleId, string roleName, CancellationToken cancellationToken);
     }
 }
+ 

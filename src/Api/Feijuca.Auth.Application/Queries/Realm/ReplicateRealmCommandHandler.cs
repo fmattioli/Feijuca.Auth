@@ -99,6 +99,24 @@ namespace Feijuca.Auth.Application.Queries.Realm
                 await clientScopesRepository.AddUserPropertyMapperAsync(clientScopeProfile.Id!, "tenant", "tenant", targetTenant, cancellationToken);
             }
 
+            if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroups ?? false)
+            {
+                var originGroups = (await groupRepository.GetAllAsync(cancellationToken)).Data
+                    .Where(x => x.Name != Constants.AdminGroupName);
+
+                foreach (var group in originGroups)
+                {
+                    var roulesGroup = (await groupRolesRepository.GetGroupRolesAsync(group.Id, cancellationToken)).Data;
+                    var groupCreateId = await groupRepository.CreateAsync(group.Name, targetTenant, [], cancellationToken);
+                    
+
+                    foreach (var role in roulesGroup)
+                    {
+                        await AssociateClientRulesToTheGroupAsync(targetTenant, groupCreateId.Data, role.Client, cancellationToken);
+                    }
+                }
+            }
+
             return Result<bool>.Success(true);
         }
 

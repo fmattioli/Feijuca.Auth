@@ -109,9 +109,12 @@ namespace Feijuca.Auth.Application.Queries.Realm
                     var groupCreateId = await groupRepository.CreateAsync(group.Name, targetTenant, [], cancellationToken);
                     var rolesAssociatedToGroup = (await groupRolesRepository.GetGroupRolesAsync(group.Id, cancellationToken)).Data;
 
-                    foreach (var role in rolesAssociatedToGroup)
+                    foreach (var roleAssociatedToGroup in rolesAssociatedToGroup)
                     {
-                        await groupRolesRepository.AddClientRoleToGroupAsync(groupCreateId.Data, role.Client, Guid.Parse(role.Id), "ver o nome", targetTenant, cancellationToken);
+                        foreach (var role in rolesAssociatedToGroup.SelectMany(x => x.Mappings))
+                        {
+                            await groupRolesRepository.AddClientRoleToGroupAsync(groupCreateId.Data, roleAssociatedToGroup.Client, role.Id, role.Name, targetTenant, cancellationToken);
+                        }
                     }
                 }
             }

@@ -99,7 +99,7 @@ namespace Feijuca.Auth.Application.Queries.Realm
                 await clientScopesRepository.AddUserPropertyMapperAsync(clientScopeProfile.Id!, "tenant", "tenant", targetTenant, cancellationToken);
             }
 
-            if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroups ?? false)
+            if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroups.IncludeGroups ?? false)
             {
                 var originGroups = (await groupRepository.GetAllAsync(cancellationToken)).Data
                     .Where(x => x.Name != Constants.AdminGroupName);

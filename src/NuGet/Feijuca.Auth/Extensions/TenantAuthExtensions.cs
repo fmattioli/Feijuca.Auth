@@ -1,12 +1,11 @@
-﻿using Feijuca.Auth.Models;
+﻿using Feijuca.Auth.Authentication;
+using Feijuca.Auth.Models;
 using Feijuca.Auth.Providers;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -16,7 +15,6 @@ public static class TenantAuthExtensions
 {
     public static IServiceCollection AddApiAuthentication(this IServiceCollection services, FeijucaAuthConfiguration feijucaAuthConfiguration)
     {
-        services.AddHttpContextAccessor();
         services.AddKeyCloakAuth(feijucaAuthConfiguration);
 
         return services;
@@ -27,9 +25,13 @@ public static class TenantAuthExtensions
         var keycloakBaseUrl = feijucaAuthConfiguration.KeycloakUrl.TrimEnd('/');
 
         services
+            .AddHttpContextAccessor()
             .AddSingleton<IOidcConfigManagerCache, OidcConfigManagerCache>()
+            .AddSingleton<MultiTenantOidcConfigurationManager>()
             .AddSingleton<JwtSecurityTokenHandler>()
-            .AddScoped<ITenantProvider, TenantProvider>()
+            .AddScoped<ITenantProvider, TenantProvider>();
+
+        services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddKeycloakWebApi(
                 options =>
@@ -38,45 +40,54 @@ public static class TenantAuthExtensions
                 },
                 options =>
                 {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                    options.RequireHttpsMetadata = true;
 
-                        ValidAudience = "feijuca-auth-api",
-                        ClockSkew = TimeSpan.FromMinutes(2),
-
-                        IssuerValidator = (issuer, securityToken, validationParameters) =>
+                    options.TokenValidationParameters =
+                        new TokenValidationParameters
                         {
-                            if (string.IsNullOrWhiteSpace(issuer))
-                                throw new SecurityTokenInvalidIssuerException("Missing issuer");
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
 
-                            if (!issuer.StartsWith(keycloakBaseUrl + "/", StringComparison.OrdinalIgnoreCase))
-                                throw new SecurityTokenInvalidIssuerException("Issuer outside configured Keycloak base url");
+                            ValidAudience = "feijuca-auth-api",
+                            ClockSkew = TimeSpan.FromMinutes(2),
 
-                            if (!Uri.TryCreate(issuer, UriKind.Absolute, out var uri) ||
-                                !uri.AbsolutePath.StartsWith("/realms/", StringComparison.OrdinalIgnoreCase) ||
-                                string.IsNullOrEmpty(uri.AbsolutePath.Substring("/realms/".Length)))
+                            IssuerValidator = (
+                                issuer,
+                                securityToken,
+                                validationParameters) =>
                             {
-                                throw new SecurityTokenInvalidIssuerException("Invalid issuer path");
+                                if (string.IsNullOrWhiteSpace(issuer) ||
+                                    !IsValidIssuer(issuer, keycloakBaseUrl))
+                                {
+                                    throw new SecurityTokenInvalidIssuerException(
+                                        "Invalid issuer");
+                                }
+
+                                return issuer;
                             }
-
-                            if (!string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment))
-                                throw new SecurityTokenInvalidIssuerException("Invalid issuer");
-
-                            return issuer;
-                        }
-                    };
+                        };
 
                     options.Events = new JwtBearerEvents
                     {
-                        OnMessageReceived = OnMessageReceived(),
-                        OnAuthenticationFailed = OnAuthenticationFailed,
-                        OnChallenge = OnChallenge
+                        OnMessageReceived =
+                            OnMessageReceived(keycloakBaseUrl),
+
+                        OnAuthenticationFailed =
+                            OnAuthenticationFailed,
+
+                        OnChallenge =
+                            OnChallenge
                     };
+                });
+
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<MultiTenantOidcConfigurationManager>(
+                (options, manager) =>
+                {
+                    options.ConfigurationManager = manager;
                 });
 
         ConfigureAuthorization(services, []);
@@ -84,14 +95,17 @@ public static class TenantAuthExtensions
         return services;
     }
 
-    private static Func<MessageReceivedContext, Task> OnMessageReceived()
+    private static Func<MessageReceivedContext, Task> OnMessageReceived(string keycloakBaseUrl)
     {
         return context =>
         {
             try
             {
-                var rawAuthorization = context.Request.Headers.Authorization.FirstOrDefault();
-                var rawQueryToken = context.Request.Query["access_token"].FirstOrDefault();
+                var rawAuthorization =
+                    context.Request.Headers.Authorization.FirstOrDefault();
+
+                var rawQueryToken =
+                    context.Request.Query["access_token"].FirstOrDefault();
 
                 string? token = null;
 
@@ -99,8 +113,11 @@ public static class TenantAuthExtensions
                 {
                     const string bearerPrefix = "Bearer ";
 
-                    if (!rawAuthorization.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase))
+                    if (!rawAuthorization.StartsWith(
+                            bearerPrefix,
+                            StringComparison.OrdinalIgnoreCase))
                     {
+                        context.HttpContext.Items["AuthError"] = "Invalid authorization scheme";
                         context.Fail("Invalid authorization scheme");
                         return Task.CompletedTask;
                     }
@@ -114,37 +131,43 @@ public static class TenantAuthExtensions
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
+                    context.HttpContext.Items["AuthError"] = "Missing token";
                     context.Fail("Missing token");
                     return Task.CompletedTask;
                 }
 
-                context.Token = token;
-
-                var handler = new JwtSecurityTokenHandler();
+                var handler = context.HttpContext.RequestServices
+                    .GetRequiredService<JwtSecurityTokenHandler>();
 
                 if (!handler.CanReadToken(token))
                 {
+                    context.HttpContext.Items["AuthError"] = "Invalid token format";
                     context.Fail("Invalid token format");
                     return Task.CompletedTask;
                 }
 
                 var jwt = handler.ReadJwtToken(token);
-                var issuer = jwt.Issuer?.Trim();
+                var issuer = jwt.Issuer?.TrimEnd('/');
 
                 if (string.IsNullOrWhiteSpace(issuer))
                 {
+                    context.HttpContext.Items["AuthError"] = "Missing issuer";
                     context.Fail("Missing issuer");
                     return Task.CompletedTask;
                 }
 
-                var metadataAddress = issuer.TrimEnd('/') + "/.well-known/openid-configuration";
+                if (!IsValidIssuer(issuer, keycloakBaseUrl))
+                {
+                    context.HttpContext.Items["AuthError"] = "Invalid issuer";
+                    context.Fail("Invalid issuer");
+                    return Task.CompletedTask;
+                }
 
-                var cache = context.HttpContext.RequestServices
-                    .GetRequiredService<IOidcConfigManagerCache>();
+                context.Token = token;
 
-                context.Options.MetadataAddress = metadataAddress;
-                context.Options.ConfigurationManager =
-                    cache.Get(metadataAddress, context.Options.RequireHttpsMetadata);
+                context.HttpContext.Items[
+                    MultiTenantOidcConfigurationManager.IssuerKey
+                ] = issuer;
 
                 return Task.CompletedTask;
             }
@@ -152,7 +175,6 @@ public static class TenantAuthExtensions
             {
                 context.HttpContext.Items["AuthError"] = $"Authentication setup failed: {ex.Message}";
                 context.HttpContext.Items["AuthStatusCode"] = 401;
-
                 context.Fail($"Authentication setup failed: {ex.Message}");
                 return Task.CompletedTask;
             }
@@ -161,53 +183,127 @@ public static class TenantAuthExtensions
 
     private static Task OnAuthenticationFailed(AuthenticationFailedContext context)
     {
-        var errorMessage =
-            context.HttpContext.Items["AuthError"] as string
-            ?? context.Exception?.Message
-            ?? "Authentication failed!";
+        var errorMessage = context.HttpContext.Items["AuthError"] as string ?? context.Exception?.Message ?? "Authentication failed!";
 
-        var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? 401;
+        var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? StatusCodes.Status401Unauthorized;
+
+        if (context.Response.HasStarted)
+        {
+            return Task.CompletedTask;
+        }
 
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
-        return context.Response.WriteAsJsonAsync(new { error = errorMessage });
+
+        return context.Response.WriteAsJsonAsync(
+            new
+            {
+                error = errorMessage
+            });
     }
 
     private static async Task OnChallenge(JwtBearerChallengeContext context)
     {
-        if (!context.Response.HasStarted)
-        {
-            var errorMessage =
-                context.HttpContext.Items["AuthError"] as string
-                ?? context.ErrorDescription
-                ?? "Authentication failed!";
-
-            var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? 401;
-
-            context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { Message = errorMessage });
-        }
-
         context.HandleResponse();
+
+        if (context.Response.HasStarted)
+            return;
+
+        var errorMessage = context.HttpContext.Items["AuthError"] as string ?? context.ErrorDescription ?? "Authentication failed!";
+
+        var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? StatusCodes.Status401Unauthorized;
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(
+            new
+            {
+                message = errorMessage
+            });
     }
 
     private static void ConfigureAuthorization(IServiceCollection services, IEnumerable<Policy>? policySettings)
     {
         services
-           .AddAuthorization()
-           .AddKeycloakAuthorization();
+            .AddAuthorization()
+            .AddKeycloakAuthorization();
 
-        foreach (var policy in (policySettings ?? []).Where(policy => !string.IsNullOrEmpty(policy.Name)))
+        foreach (var policy in
+                 (policySettings ?? [])
+                 .Where(policy => !string.IsNullOrWhiteSpace(policy.Name)))
         {
             services
                 .AddAuthorizationBuilder()
-                .AddPolicy(policy.Name, p =>
-                {
-                    p.RequireResourceRolesForClient(
-                        "feijuca-auth-api",
-                        [.. policy.Roles!]);
-                });
+                .AddPolicy(
+                    policy.Name,
+                    authorizationPolicy =>
+                    {
+                        authorizationPolicy.RequireResourceRolesForClient(
+                            "feijuca-auth-api",
+                            [.. policy.Roles!]);
+                    });
         }
+    }
+
+    private static bool IsValidIssuer(
+        string issuer,
+        string keycloakBaseUrl)
+    {
+        if (!Uri.TryCreate(
+                issuer,
+                UriKind.Absolute,
+                out var issuerUri))
+        {
+            return false;
+        }
+
+        if (!Uri.TryCreate(
+                keycloakBaseUrl,
+                UriKind.Absolute,
+                out var keycloakUri))
+        {
+            return false;
+        }
+
+        if (!string.Equals(
+                issuerUri.Scheme,
+                keycloakUri.Scheme,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!string.Equals(
+                issuerUri.Authority,
+                keycloakUri.Authority,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!issuerUri.AbsolutePath.StartsWith(
+                "/realms/",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var realm =
+            issuerUri.AbsolutePath["/realms/".Length..];
+
+        if (string.IsNullOrWhiteSpace(realm) ||
+            realm.Contains('/'))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(issuerUri.Query) ||
+            !string.IsNullOrEmpty(issuerUri.Fragment))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

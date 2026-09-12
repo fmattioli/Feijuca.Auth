@@ -5,6 +5,6 @@ public record ReplicationConfigurationRequest(
     bool IncludeClientRoles,
     bool IncludeClientScopes,
     bool CreateAdminGroupWithAllRulesAssociated,
-    IEnumerable<string> IncludeGroups,
+    IncludeGroupsRequest IncludeGroups,
     LoginUserRequest AdminUser
     );

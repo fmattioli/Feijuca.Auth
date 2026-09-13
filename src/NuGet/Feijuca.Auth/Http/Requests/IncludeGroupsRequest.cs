@@ -1,3 +1,3 @@
 ﻿namespace Feijuca.Auth.Http.Requests;
 
-public record IncludeGroupsRequest(bool IncludeGroups, IEnumerable<string>? Groups);
+public record IncludeGroupsRequest(bool Include, IEnumerable<string>? GroupNames);

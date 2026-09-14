@@ -8,6 +8,13 @@ namespace Feijuca.Auth.Middlewares
     {
         public async Task InvokeAsync(HttpContext context, ITenantProvider tenantService)
         {
+            var tenantFromHeader = context.Request.Headers["Tenant"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(tenantFromHeader))
+            {
+                tenantService.SetRequestedTenant(tenantFromHeader);
+            }
+
             var endpoint = context.GetEndpoint();
 
             var allowAnonymous = endpoint?.Metadata.GetMetadata<IAllowAnonymous>() is not null;

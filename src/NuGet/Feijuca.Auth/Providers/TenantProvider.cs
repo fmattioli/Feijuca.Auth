@@ -119,7 +119,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     public Tenant? GetRequestedTenant()
     {
-        return _requestedTenant;
+        return _requestedTenant ?? _tenant;
     }
 
     public Tenant GetTenantContext()

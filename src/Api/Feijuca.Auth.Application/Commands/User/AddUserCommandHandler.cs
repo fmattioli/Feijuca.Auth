@@ -9,7 +9,7 @@ namespace Feijuca.Auth.Application.Commands.User
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<Result<Guid>> HandleAsync(AddUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> HandleAsync(AddUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = request.AddUserRequest.ToDomain(request.Tenant);
             var result = await _userRepository.CreateAsync(user, cancellationToken);

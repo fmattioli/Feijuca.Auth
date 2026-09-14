@@ -376,12 +376,12 @@ namespace Feijuca.Auth.Infra.Data.Repositories
 
             var urlGetToken = httpClient.BaseAddress
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantService.GetRequestedTenant())
+                .AppendPathSegment(_tenantService.GetRequestedTenant()!.Name)
                 .AppendPathSegment("protocol")
                 .AppendPathSegment("openid-connect")
                 .AppendPathSegment("token");
 
-            var client = await clientRepository.GetClientAsync("feijuca-auth-api", _tenantService.Tenant.Name, cancellationToken);
+            var client = await clientRepository.GetClientAsync("feijuca-auth-api", _tenantService.GetRequestedTenant()!.Name, cancellationToken);
 
             var requestData = new FormUrlEncodedContent(
             [

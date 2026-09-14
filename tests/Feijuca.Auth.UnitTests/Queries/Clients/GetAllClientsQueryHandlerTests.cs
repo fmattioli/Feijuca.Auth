@@ -32,7 +32,7 @@ namespace Feijuca.Auth.Api.UnitTests.Queries.Clients
             var clientsResult = Result<IEnumerable<ClientEntity>>.Success(clients);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _clientRepositoryMock
@@ -60,7 +60,7 @@ namespace Feijuca.Auth.Api.UnitTests.Queries.Clients
             var clientsResult = Result<IEnumerable<ClientEntity>>.Failure(ClientErrors.GetClientsErrors);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _clientRepositoryMock

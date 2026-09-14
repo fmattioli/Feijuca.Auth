@@ -75,9 +75,12 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         return authorizationHeader["Bearer ".Length..];
     }
 
-    public void SetRequestedTenant(string tenant)
+    public void SetRequestedTenant(string? tenant)
     {
-        _requestedTenant = new Tenant(tenant);
+        if (!string.IsNullOrEmpty(tenant))
+        {
+            _requestedTenant = new Tenant(tenant);
+        }
     }
 
     public void SetTenants(IEnumerable<Tenant> tenants)

@@ -6,13 +6,15 @@ namespace Feijuca.Auth.Middlewares
 {
     public class TenantMiddleware(RequestDelegate next)
     {
-
         public async Task InvokeAsync(HttpContext context, ITenantProvider tenantService)
         {
             var endpoint = context.GetEndpoint();
-            var hasAuthorize = endpoint?.Metadata?.GetMetadata<AuthorizeAttribute>() != null;
 
-            if (!hasAuthorize)
+            var allowAnonymous = endpoint?.Metadata.GetMetadata<IAllowAnonymous>() is not null;
+
+            var requiresAuthorization = endpoint?.Metadata.GetOrderedMetadata<IAuthorizeData>().Any() == true;
+
+            if (allowAnonymous || !requiresAuthorization)
             {
                 await next(context);
                 return;
@@ -23,18 +25,23 @@ namespace Feijuca.Auth.Middlewares
 
             if (!tenants.Any() || user.Id == Guid.Empty)
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 context.Response.ContentType = "application/json";
 
-                var response = new { error = "Jwt token authorization header is required." };
-
-                await context.Response.WriteAsJsonAsync(response);
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    error = "Jwt token authorization header is required."
+                });
 
                 return;
             }
 
+            // Who is authenticated following JWT token
             tenantService.SetTenants(tenants);
             tenantService.SetUser(user);
+
+            // What tenant the action should be performed
+            tenantService.SetRequestedTenant(context.Request.Headers["Tenant"].FirstOrDefault() ?? "");
 
             await next(context);
         }

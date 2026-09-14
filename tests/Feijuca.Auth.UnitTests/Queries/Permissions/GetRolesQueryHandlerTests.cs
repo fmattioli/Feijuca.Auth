@@ -32,7 +32,7 @@ namespace Feijuca.Auth.Api.UnitTests.Queries.Permissions
             var rolesResult = Result<IEnumerable<ClientEntity>>.Failure(RoleErrors.GetRoleErrors);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _clientRepositoryMock
@@ -63,7 +63,7 @@ namespace Feijuca.Auth.Api.UnitTests.Queries.Permissions
             var rolesResult = Result<IEnumerable<Role>>.Failure(RoleErrors.GetRoleErrors);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _clientRepositoryMock
@@ -108,7 +108,7 @@ namespace Feijuca.Auth.Api.UnitTests.Queries.Permissions
             var rolesResult = Result<IEnumerable<Role>>.Success(roles);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _clientRepositoryMock

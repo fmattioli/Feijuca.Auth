@@ -35,7 +35,7 @@ namespace Feijuca.Auth.Api.UnitTests.Command.Roles
             var addRoleResult = Result<bool>.Success(true);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _roleRepositoryMock
@@ -68,7 +68,7 @@ namespace Feijuca.Auth.Api.UnitTests.Command.Roles
             var addRoleResult = Result<bool>.Failure(RoleErrors.AddRoleErrors);
 
             _tenantProviderMock
-                .Setup(provider => provider.Tenant)
+                .Setup(provider => provider.GetRequestedTenant())
                 .Returns(_fixture.Create<Tenant>());
 
             _roleRepositoryMock

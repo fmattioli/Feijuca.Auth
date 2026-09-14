@@ -8,6 +8,7 @@ public class TenantMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context, ITenantProvider tenantService)
     {
+        // What tenant the action should be performed
         var tenantFromHeader = context.Request.Headers["Tenant"].FirstOrDefault();
 
         if (!string.IsNullOrEmpty(tenantFromHeader))
@@ -46,9 +47,6 @@ public class TenantMiddleware(RequestDelegate next)
         // Who is authenticated following JWT token
         tenantService.SetTenants(tenants);
         tenantService.SetUser(user);
-
-        // What tenant the action should be performed
-        tenantService.SetRequestedTenant(context.Request.Headers["Tenant"].FirstOrDefault() ?? "");
 
         await next(context);
     }

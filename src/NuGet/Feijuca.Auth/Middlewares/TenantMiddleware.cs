@@ -2,55 +2,54 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace Feijuca.Auth.Middlewares
+namespace Feijuca.Auth.Middlewares;
+
+public class TenantMiddleware(RequestDelegate next)
 {
-    public class TenantMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context, ITenantProvider tenantService)
     {
-        public async Task InvokeAsync(HttpContext context, ITenantProvider tenantService)
+        var tenantFromHeader = context.Request.Headers["Tenant"].FirstOrDefault();
+
+        if (!string.IsNullOrEmpty(tenantFromHeader))
         {
-            var tenantFromHeader = context.Request.Headers["Tenant"].FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(tenantFromHeader))
-            {
-                tenantService.SetRequestedTenant(tenantFromHeader);
-            }
-
-            var endpoint = context.GetEndpoint();
-
-            var allowAnonymous = endpoint?.Metadata.GetMetadata<IAllowAnonymous>() is not null;
-
-            var requiresAuthorization = endpoint?.Metadata.GetOrderedMetadata<IAuthorizeData>().Any() == true;
-
-            if (allowAnonymous || !requiresAuthorization)
-            {
-                await next(context);
-                return;
-            }
-
-            var tenants = tenantService.GetTenants();
-            var user = tenantService.GetUser();
-
-            if (!tenants.Any() || user.Id == Guid.Empty)
-            {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                context.Response.ContentType = "application/json";
-
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    error = "Jwt token authorization header is required."
-                });
-
-                return;
-            }
-
-            // Who is authenticated following JWT token
-            tenantService.SetTenants(tenants);
-            tenantService.SetUser(user);
-
-            // What tenant the action should be performed
-            tenantService.SetRequestedTenant(context.Request.Headers["Tenant"].FirstOrDefault() ?? "");
-
-            await next(context);
+            tenantService.SetRequestedTenant(tenantFromHeader);
         }
+
+        var endpoint = context.GetEndpoint();
+
+        var allowAnonymous = endpoint?.Metadata.GetMetadata<IAllowAnonymous>() is not null;
+
+        var requiresAuthorization = endpoint?.Metadata.GetOrderedMetadata<IAuthorizeData>().Any() == true;
+
+        if (allowAnonymous || !requiresAuthorization)
+        {
+            await next(context);
+            return;
+        }
+
+        var tenants = tenantService.GetTenants();
+        var user = tenantService.GetUser();
+
+        if (!tenants.Any() || user.Id == Guid.Empty)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "Jwt token authorization header is required."
+            });
+
+            return;
+        }
+
+        // Who is authenticated following JWT token
+        tenantService.SetTenants(tenants);
+        tenantService.SetUser(user);
+
+        // What tenant the action should be performed
+        tenantService.SetRequestedTenant(context.Request.Headers["Tenant"].FirstOrDefault() ?? "");
+
+        await next(context);
     }
 }

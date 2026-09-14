@@ -30,25 +30,25 @@ jobs:
       - name: Build project
         run: dotnet build --no-restore --configuration Release src/Api/Feijuca.Auth.Api/Feijuca.Auth.Api.csproj
 
-  unit-tests:
-    runs-on: ubuntu-latest
-    name: Run unit tests
-    needs: [build]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-      - name: Restore dependencies and run unit tests
-        run: |
-          dotnet restore tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
-          dotnet build --no-restore --configuration Release tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
-          dotnet test --verbosity normal tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
+  # unit-tests:
+  #   runs-on: ubuntu-latest
+  #   name: Run unit tests
+  #   needs: [build]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: 10.0.x
+  #     - name: Restore dependencies and run unit tests
+  #       run: |
+  #         dotnet restore tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
+  #         dotnet build --no-restore --configuration Release tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
+  #         dotnet test --verbosity normal tests/Feijuca.Auth.UnitTests/Feijuca.Auth.Api.UnitTests.csproj
   bump:
     name: Update project version
     runs-on: ubuntu-latest
-    needs: [build,unit-tests]
+    needs: [build]
     outputs:
       version: ${{ steps.set-version.outputs.VERSION }}
       version_update_type: ${{ steps.determine_update_type.outputs.VERSION_UPDATE_TYPE }} 

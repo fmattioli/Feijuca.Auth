@@ -7,12 +7,10 @@ using LiteBus.Commands.Abstractions;
 
 namespace Feijuca.Auth.Application.Commands.User
 {
-    public class LoginCommandHandler(IUserRepository userRepository, ITenantProvider tenantService) : ICommandHandler<LoginCommand, Result<TokenDetailsResponse>>
+    public class LoginCommandHandler(IUserRepository userRepository) : ICommandHandler<LoginCommand, Result<TokenDetailsResponse>>
     {
-        public async Task<Result<TokenDetailsResponse>> HandleAsync(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<Result<TokenDetailsResponse>> HandleAsync(LoginCommand request, CancellationToken cancellationToken = default)
         {
-            tenantService.SetTenants([new Tenant(request.Tenant)]);
-
             var result = await userRepository.LoginAsync(request.LoginUser.Username, request.LoginUser.Password, cancellationToken);
 
             return result.IsSuccess ? Result<TokenDetailsResponse>.Success(result.Data.ToTokenDetailResponse()) : Result<TokenDetailsResponse>.Failure(result.Error);

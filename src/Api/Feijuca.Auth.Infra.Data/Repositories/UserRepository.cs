@@ -376,7 +376,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
 
             var urlGetToken = httpClient.BaseAddress
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment(_tenantService.GetRequestedTenant())
                 .AppendPathSegment("protocol")
                 .AppendPathSegment("openid-connect")
                 .AppendPathSegment("token");

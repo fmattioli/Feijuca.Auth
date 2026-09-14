@@ -9,9 +9,9 @@ namespace Feijuca.Auth.Application.Queries.Clients
     {
         private readonly IClientRepository _clientRepository = clientRepository;
 
-        public async Task<IEnumerable<ClientResponse>> HandleAsync(GetAllClientsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ClientResponse>> HandleAsync(GetAllClientsQuery request, CancellationToken cancellationToken = default)
         {
-            var clientsResult = await _clientRepository.GetClientsAsync(tenantProvider.Tenant.Name, cancellationToken);
+            var clientsResult = await _clientRepository.GetClientsAsync(tenantProvider.GetRequestedTenant()!.Name, cancellationToken);
 
             if (clientsResult.IsSuccess)
             {

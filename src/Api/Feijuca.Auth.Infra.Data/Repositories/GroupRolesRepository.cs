@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Feijuca.Auth.Infra.Data.Repositories
 {
-    public class GroupRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepository _authRepository, ITenantProvider _tenantService)
+    public class GroupRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepository _authRepository, ITenantProvider _tenantProvider)
         : BaseRepository(httpClientFactory), IGroupRolesRepository
     {
 
@@ -93,7 +93,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                     .AppendPathSegment("admin")
                     .AppendPathSegment("realms")
-                    .AppendPathSegment(_tenantService.Tenant.Name)
+                    .AppendPathSegment(_tenantProvider.GetRequestedTenant()!.Name)
                     .AppendPathSegment("groups")
                     .AppendPathSegment(groupId)
                     .AppendPathSegment("role-mappings")

@@ -28,7 +28,7 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
                 clientRole.ClientId,
                 clientRole.Name,
                 clientRole.Description,
-                tenantProvider.Tenant.Name,
+                tenantProvider.GetRequestedTenant()!.Name,
                 cancellationToken);
 
             if (!result.IsSuccess)
@@ -41,7 +41,7 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
         {
             var realms = await realmRepository.GetAllAsync(cancellationToken);
             var tenants = realms
-                .Where(r => r.Realm != tenantProvider.Tenant.Name)
+                .Where(r => r.Realm != tenantProvider.GetRequestedTenant()!.Name)
                 .Select(r => r.Realm);
 
             foreach (var tenant in tenants)
@@ -52,7 +52,7 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
                         clientRole.ClientId,
                         clientRole.Name,
                         clientRole.Description,
-                        tenant,
+                        tenantProvider.GetRequestedTenant()!.Name,
                         cancellationToken);
 
                     if (!result.IsSuccess)

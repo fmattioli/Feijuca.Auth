@@ -14,7 +14,7 @@ namespace Feijuca.Auth.Application.Queries.GroupRoles
 
         public async Task<Result<IEnumerable<GroupRolesResponse>>> HandleAsync(GetGroupRolesQuery request, CancellationToken cancellationToken = default)
         {
-            var groupsRolesResult = await _roleGroupRepository.GetGroupRolesAsync(request.GroupId, tenantProvider.Tenant.Name, cancellationToken);
+            var groupsRolesResult = await _roleGroupRepository.GetGroupRolesAsync(request.GroupId, tenantProvider.GetRequestedTenant()!.Name, cancellationToken);
 
             if (groupsRolesResult.IsSuccess)
             {

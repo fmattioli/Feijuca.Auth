@@ -34,7 +34,7 @@ public class AddClientRoleToGroupCommandHandler(IGroupRepository groupRepository
                     request.AddRoleToGroupRequest.ClientId,
                     role.Id,
                     role.Name,
-                    tenantProvider.Tenant.Name,
+                    tenantProvider.GetRequestedTenant()!.Name,
                     cancellationToken);
 
                 if (result.IsSuccess)

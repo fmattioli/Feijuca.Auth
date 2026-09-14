@@ -14,15 +14,15 @@ namespace Feijuca.Auth.Application.Queries.Permissions
         private readonly IClientRepository _clientRepository = clientRepository;
         private readonly IClientRoleRepository _roleRepository = roleRepository;
 
-        public async Task<Result<IEnumerable<ClientRoleResponse>>> HandleAsync(GetClientRolesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ClientRoleResponse>>> HandleAsync(GetClientRolesQuery request, CancellationToken cancellationToken = default)
         {
-            var result = await _clientRepository.GetClientsAsync(tenantProvider.Tenant.Name, cancellationToken);
+            var result = await _clientRepository.GetClientsAsync(tenantProvider.GetRequestedTenant()!.Name, cancellationToken);
             if (result.IsSuccess)
             {
                 var roleResponse = new List<ClientRoleResponse>();
                 foreach (var client in result.Data)
                 {
-                    var rolesResult = await _roleRepository.GetRolesForClientAsync(client.Id, tenantProvider.Tenant.Name, cancellationToken);
+                    var rolesResult = await _roleRepository.GetRolesForClientAsync(client.Id, tenantProvider.GetRequestedTenant()!.Name, cancellationToken);
 
                     if (rolesResult.IsSuccess)
                     {

@@ -21,7 +21,7 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
         var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment(_tenantService.GetRequestedTenant()!.Name)
                 .AppendPathSegment("users")
                 .AppendPathSegment(userId)
                 .AppendPathSegment("role-mappings");
@@ -52,7 +52,7 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
         var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment(_tenantService.GetRequestedTenant()!.Name)
                 .AppendPathSegment("users")
                 .AppendPathSegment(userId)
                 .AppendPathSegment("role-mappings")
@@ -84,7 +84,7 @@ public class UserRolesRepository(IHttpClientFactory httpClientFactory, IAuthRepo
         var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment(_tenantService.GetRequestedTenant()!.Name)
                 .AppendPathSegment("users")
                 .AppendPathSegment(userId)
                 .AppendPathSegment("role-mappings")

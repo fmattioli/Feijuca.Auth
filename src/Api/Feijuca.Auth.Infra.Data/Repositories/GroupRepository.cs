@@ -31,7 +31,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 var url = httpClient.BaseAddress
                         .AppendPathSegment("admin")
                         .AppendPathSegment("realms")
-                        .AppendPathSegment(_tenantProvider.Tenant.Name)
+                        .AppendPathSegment(_tenantProvider.GetRequestedTenant())
                         .AppendPathSegment("groups");
 
                 using var response = await httpClient.GetAsync(url, cancellationToken);
@@ -59,7 +59,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(tenant ?? _tenantProvider.Tenant.Name)
+                .AppendPathSegment(tenant ?? _tenantProvider.GetRequestedTenant()!.Name)
                 .AppendPathSegment("groups");
 
             if (!string.IsNullOrWhiteSpace(groupName))
@@ -89,7 +89,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(tenant)
+                .AppendPathSegment(tenant ?? _tenantProvider.GetRequestedTenant()!.Name)
                 .AppendPathSegment("groups");
 
             var group = new
@@ -130,7 +130,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                 .AppendPathSegment("admin")
                 .AppendPathSegment("realms")
-                .AppendPathSegment(_tenantProvider.Tenant.Name)
+                .AppendPathSegment(_tenantProvider.GetRequestedTenant()!.Name)
                 .AppendPathSegment("groups")
                 .AppendPathSegment(group.Id);
 
@@ -156,7 +156,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                     .AppendPathSegment("admin")
                     .AppendPathSegment("realms")
-                    .AppendPathSegment(_tenantProvider.Tenant.Name)
+                    .AppendPathSegment(_tenantProvider.GetRequestedTenant()!.Name)
                     .AppendPathSegment("groups")
                     .AppendPathSegment(id);
 
@@ -179,7 +179,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var url = httpClient.BaseAddress
                     .AppendPathSegment("admin")
                     .AppendPathSegment("realms")
-                    .AppendPathSegment(_tenantProvider.Tenant.Name)
+                    .AppendPathSegment(_tenantProvider.GetRequestedTenant()!.Name)
                     .AppendPathSegment("groups")
                     .AppendPathSegment(id)
                     .AppendPathSegment("members")

@@ -31,7 +31,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 var url = httpClient.BaseAddress
                         .AppendPathSegment("admin")
                         .AppendPathSegment("realms")
-                        .AppendPathSegment(_tenantProvider.GetRequestedTenant())
+                        .AppendPathSegment(_tenantProvider.GetRequestedTenant()!.Name)
                         .AppendPathSegment("groups");
 
                 using var response = await httpClient.GetAsync(url, cancellationToken);

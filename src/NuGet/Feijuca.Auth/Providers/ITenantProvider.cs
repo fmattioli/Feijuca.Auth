@@ -33,4 +33,6 @@ public interface ITenantProvider
     void SetTenants(IEnumerable<Tenant> tenants);
 
     void SetUser(User user);
+
+    void SetEffectiveTenant();
 }

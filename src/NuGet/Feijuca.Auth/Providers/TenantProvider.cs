@@ -94,6 +94,14 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         _tenant = new Tenant(tenant);
     }
 
+    public void SetEffectiveTenant()
+    {
+        if (_requestedTenant?.Name == _tenant?.Name)
+        {
+            _requestedTenant = null!;
+        }
+    }
+
     public void SetUser(User user)
     {
         _userId = user;

@@ -48,6 +48,8 @@ public class TenantMiddleware(RequestDelegate next)
         tenantService.SetTenants(tenants);
         tenantService.SetUser(user);
 
+        tenantService.SetEffectiveTenant();
+
         await next(context);
     }
 }

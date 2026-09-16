@@ -1,9 +1,11 @@
 ﻿using Feijuca.Auth.Application.Commands.RealmAssociations;
 using Feijuca.Auth.Application.Commands.RealmAttributes;
+using Feijuca.Auth.Application.Queries.RealmAssociations;
 using Feijuca.Auth.Application.Requests.RealmAssociations;
 using Feijuca.Auth.Application.Requests.RealmAttributes;
 using Feijuca.Auth.Attributes;
 using LiteBus.Commands.Abstractions;
+using LiteBus.Queries.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +14,34 @@ namespace Feijuca.Auth.Api.Controllers;
 [Route("api/v1/realms-associations")]
 [ApiController]
 [Authorize]
-public class RealmsAssociationsController(ICommandMediator commandMediator) : ControllerBase
+public class RealmsAssociationsController(ICommandMediator commandMediator, IQueryMediator queryMediator) : ControllerBase
 {
+    /// <summary>
+    /// Gets all associations from an existin realm in Keycloak.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
+    /// <returns>
+    /// A 200 OK status code if the associations are successfully retrieved;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    [HttpGet]
+    [EndpointDescription("This endpoint gets all realms associations related to the an existing realm.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiReader")]
+    public async Task<IActionResult> GetAssociations(CancellationToken cancellationToken)
+    {
+        var result = await queryMediator.QueryAsync(new GetRealmAssociationsQuery(), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Data);
+        }
+
+        return BadRequest(result.Error);
+    }
+
     /// <summary>
     /// Adds a association between realms in Keycloak.
     /// </summary>

@@ -87,6 +87,57 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<bool> AddAllowedTenantsMapperAsync(
+            string clientScopeId,
+            string tenant,
+            IEnumerable<string> allowedTenants,
+            CancellationToken cancellationToken)
+        {
+            var tokenDetails = await authRepository.GetAccessTokenAsync(cancellationToken);
+
+            using var httpClient = CreateHttpClientWithHeaders(
+                tokenDetails.Data.Access_Token);
+
+            var url = httpClient.BaseAddress
+                .AppendPathSegment("admin")
+                .AppendPathSegment("realms")
+                .AppendPathSegment(tenant)
+                .AppendPathSegment("client-scopes")
+                .AppendPathSegment(clientScopeId)
+                .AppendPathSegment("protocol-mappers")
+                .AppendPathSegment("models");
+
+            var mapper = new
+            {
+                name = "allowed-tenants",
+                protocol = "openid-connect",
+                protocolMapper = "oidc-hardcoded-claim-mapper",
+
+                config = new Dictionary<string, string>
+                {
+                    { "claim.name", "allowed-tenants" },
+
+                    { "claim.value", string.Join(",", allowedTenants) },
+
+                    { "jsonType.label", "String" },
+
+                    { "id.token.claim", "true" },
+                    { "access.token.claim", "true" },
+
+                    { "userinfo.token.claim", "true" },
+                    { "access.tokenResponse.claim", "true" },
+                    { "introspection.token.claim", "true" },
+                    { "lightweight.claim", "false" }
+                }
+            };
+
+            var response = await httpClient.PostAsJsonAsync(
+                url,
+                mapper,
+                cancellationToken);
+
+            return response.IsSuccessStatusCode;
+        }
 
         public async Task<bool> AddUserPropertyMapperAsync(string clientScopeId, 
             string userPropertyName, 

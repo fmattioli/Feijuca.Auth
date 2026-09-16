@@ -21,6 +21,7 @@ namespace Feijuca.Auth.Domain.Interfaces
         Task<IEnumerable<ClientScopeEntity>> GetClientScopesAsync(string tenant, CancellationToken cancellationToken);
         Task<bool> AddAudienceMapperAsync(string clientScopeId, string tenant, CancellationToken cancellationToken);
         Task<bool> AddGroupMembershipMapperAsync(string clientScopeId, string tenant, CancellationToken cancellationToken);
+        Task<bool> AddAllowedTenantsMapperAsync(string clientScopeId, string tenant, IEnumerable<string> allowedTenants, CancellationToken cancellationToken);
         Task<ClientScopeEntity> GetClientScopeProfileAsync(string tenant, CancellationToken cancellationToken);
         Task<IEnumerable<ClientScopeEntity>> GetClientScopesAssociatedToTheClientAsync(string tenant, string clientId, CancellationToken cancellationToken);
     }

@@ -41,4 +41,32 @@ public class RealmsAssociationsController(ICommandMediator commandMediator) : Co
 
         return BadRequest(result.Error);
     }
+
+    /// <summary>
+    /// Removes associations between realms in Keycloak.
+    /// </summary>
+    /// <param name="removeRealmAssociationsRequest">The request object containing the necessary details to remove realms associations from the realm.</param>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
+    /// <returns>
+    /// A 201 Created status code if the associations are successfully removed;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    [HttpDelete]
+    [EndpointDescription("This endpoint removes realms associations from an existing realm.")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    public async Task<IActionResult> RemoveAssociations([FromBody] RemoveRealmAssociationsRequest removeRealmAssociationsRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new RemoveRealmAssociationsCommand(removeRealmAssociationsRequest), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok();
+        }
+
+        return BadRequest(result.Error);
+    }
 }

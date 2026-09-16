@@ -40,7 +40,7 @@ namespace Feijuca.Auth.Application.Mappers
             {
                 foreach (var item in protocolMapperEntity)
                 {
-                    list.Add(new ProtocolMapperResponse(item.Id, item.Name, item.Protocol, item.ProtocolMapperType, item.ConsentRequired, item.Config));
+                    list.Add(new ProtocolMapperResponse(item.Id, item.Name, item.Protocol, item.ProtocolMapper, item.ConsentRequired, item.Config));
                 }
             }
 

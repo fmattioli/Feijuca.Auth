@@ -15,7 +15,7 @@
         public required string Id { get; set; }
         public required string Name { get; set; }
         public required string Protocol { get; set; }
-        public required string ProtocolMapperType { get; set; }
+        public required string ProtocolMapper { get; set; }
         public bool ConsentRequired { get; set; }
         public required Dictionary<string, string> Config { get; set; }
     }

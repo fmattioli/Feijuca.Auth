@@ -1,4 +1,5 @@
 ﻿using Feijuca.Auth.Domain.Entities;
+using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Domain.Interfaces
 {
@@ -22,6 +23,7 @@ namespace Feijuca.Auth.Domain.Interfaces
         Task<bool> AddAudienceMapperAsync(string clientScopeId, string tenant, CancellationToken cancellationToken);
         Task<bool> AddGroupMembershipMapperAsync(string clientScopeId, string tenant, CancellationToken cancellationToken);
         Task<bool> AddAllowedTenantsMapperAsync(string clientScopeId, string tenant, IEnumerable<string> allowedTenants, CancellationToken cancellationToken);
+        Task<Result> UpdateAllowedTenantsMapperAsync(string clientScopeId, string tenant, ProtocolMapperEntity protocolMapper, CancellationToken cancellationToken);
         Task<ClientScopeEntity> GetClientScopeProfileAsync(string tenant, CancellationToken cancellationToken);
         Task<IEnumerable<ClientScopeEntity>> GetClientScopesAssociatedToTheClientAsync(string tenant, string clientId, CancellationToken cancellationToken);
     }

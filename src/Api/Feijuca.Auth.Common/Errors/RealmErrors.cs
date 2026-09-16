@@ -45,5 +45,15 @@ namespace Feijuca.Auth.Common.Errors
             "Realm.NotFoundError",
             $"Realm with provided name was not found. {TechnicalMessage}"
         );
+
+        public static Error AllowedTenantsMapperNotFoundError => new(
+            "Realm.AllowedTenantsMapperNotFoundError",
+            $"Allowed tenants protocol mapper not found. {TechnicalMessage}"
+        );
+
+        public static Error UpdateClientScopeProtocolMapperError => new(
+            "Realm.UpdateClientScopeProtocolMapperError",
+            $"An error occurred while trying update the client scope protocol mapper. {TechnicalMessage}"
+        );
     }
 }

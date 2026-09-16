@@ -1,6 +1,8 @@
 ﻿using Feijuca.Auth.Common;
+using Feijuca.Auth.Common.Errors;
 using Feijuca.Auth.Domain.Entities;
 using Feijuca.Auth.Domain.Interfaces;
+using Feijuca.Auth.Models;
 using Flurl;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
@@ -137,6 +139,42 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 cancellationToken);
 
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<Result> UpdateAllowedTenantsMapperAsync(
+            string clientScopeId,
+            string tenant,
+            ProtocolMapperEntity protocolMapper,
+            CancellationToken cancellationToken)
+        {
+            var tokenDetails = await authRepository.GetAccessTokenAsync(cancellationToken);
+
+            using var httpClient = CreateHttpClientWithHeaders(
+                tokenDetails.Data.Access_Token);
+
+            var url = httpClient.BaseAddress
+                .AppendPathSegment("admin")
+                .AppendPathSegment("realms")
+                .AppendPathSegment(tenant)
+                .AppendPathSegment("client-scopes")
+                .AppendPathSegment(clientScopeId)
+                .AppendPathSegment("protocol-mappers")
+                .AppendPathSegment("models")
+                .AppendPathSegment(protocolMapper.Id);
+
+            var response = await httpClient.PutAsJsonAsync(
+                url,
+                protocolMapper,
+                cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync(cancellationToken);
+                RealmErrors.SetTechnicalMessage(errorResponse);
+                return Result.Failure(RealmErrors.UpdateClientScopeProtocolMapperError);
+            }
+
+            return Result.Success();
         }
 
         public async Task<bool> AddUserPropertyMapperAsync(string clientScopeId, 

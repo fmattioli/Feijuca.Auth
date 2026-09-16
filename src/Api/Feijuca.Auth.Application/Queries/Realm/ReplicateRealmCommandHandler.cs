@@ -91,6 +91,7 @@ namespace Feijuca.Auth.Application.Queries.Realm
                             var clientScopeFeijuca = targetClientScopes.FirstOrDefault(x => x.Name == Constants.FeijucaApiClientName)!;
                             await clientScopesRepository.AddAudienceMapperAsync(clientScopeFeijuca.Id!, targetTenant, cancellationToken);
                             await clientScopesRepository.AddGroupMembershipMapperAsync(clientScopeFeijuca.Id!, targetTenant, cancellationToken);
+                            await clientScopesRepository.AddAllowedTenantsMapperAsync(clientScopeFeijuca.Id!, targetTenant, [targetTenant], cancellationToken);
                         }
                     }
                 }

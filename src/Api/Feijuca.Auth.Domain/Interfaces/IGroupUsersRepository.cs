@@ -1,4 +1,5 @@
-﻿using Feijuca.Auth.Models;
+﻿using Feijuca.Auth.Domain.Entities;
+using Feijuca.Auth.Models;
 
 namespace Feijuca.Auth.Domain.Interfaces
 {
@@ -6,5 +7,6 @@ namespace Feijuca.Auth.Domain.Interfaces
     {
         Task<Result<bool>> AddUserToGroupAsync(Guid userId, string tenant, Guid groupId, CancellationToken cancellationToken);
         Task<Result<bool>> RemoveUserFromGroupAsync(Guid userId, Guid groupId, CancellationToken cancellationToken);
+        Task<Result<IEnumerable<Group>>> GetUserGroupsAsync(Guid userId, CancellationToken cancellationToken);
     }
 }

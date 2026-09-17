@@ -96,5 +96,32 @@ namespace Feijuca.Auth.Api.Controllers
             var responseError = Result<string>.Failure(result.Error);
             return BadRequest(responseError);
         }
+
+        /// <summary>
+        /// Retrieves all groups to which a specific user belongs within the specified Keycloak realm.
+        /// </summary>
+        /// <returns>
+        /// A 200 OK status code with a list of groups for the user;
+        /// otherwise, a 400 Bad Request status code with an error message.
+        /// </returns>
+        /// <param name="id">The ID of the user for which to retrieve groups.</param>
+        /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> used to observe cancellation requests for the operation.</param>
+        [HttpGet("users/{id}/groups", Name = nameof(GetUserGroups))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [RequiredRole("Feijuca.ApiReader")]
+        public async Task<IActionResult> GetUserGroups([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await queryMediator.QueryAsync(new GetUserGroupsQuery(id), cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+
+            var responseError = Result<string>.Failure(result.Error);
+            return BadRequest(responseError);
+        }
     }
 }

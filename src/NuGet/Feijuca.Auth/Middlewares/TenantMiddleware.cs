@@ -28,11 +28,11 @@ public class TenantMiddleware(RequestDelegate next)
             return;
         }
 
-        var tenant = tenantService.GetTenant();
+        var tenants = tenantService.GetTenants();
         var user = tenantService.GetUser();
         var allowedTenants = tenantService.GetAllowedTenants();
 
-        if (string.IsNullOrEmpty(tenant?.Name) || user.Id == Guid.Empty)
+        if (!tenants.Any() || user.Id == Guid.Empty)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
@@ -46,7 +46,7 @@ public class TenantMiddleware(RequestDelegate next)
         }
 
         // Who is authenticated following JWT token
-        tenantService.SetTenants(allowedTenants.Any() ? allowedTenants : [tenant]);
+        tenantService.SetTenants(allowedTenants.Any() ? allowedTenants : tenants);
         tenantService.SetUser(user);
 
         tenantService.SetEffectiveTenant();

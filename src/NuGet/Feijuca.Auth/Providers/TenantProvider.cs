@@ -96,7 +96,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     public void SetEffectiveTenant()
     {
-        if (_requestedTenant?.Name == _tenant?.Name)
+        if (!_tenants.Select(x => x.Name).Contains(_requestedTenant.Name) || _requestedTenant?.Name == _tenant?.Name)
         {
             _requestedTenant = null!;
         }
@@ -150,6 +150,26 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
             });
 
             return tenants;
+        }
+
+        return [];
+    }
+
+    public IEnumerable<Tenant> GetAllowedTenants()
+    {
+        string jwtToken = GetToken();
+        if (!string.IsNullOrEmpty(jwtToken))
+        {
+            var tokenInfos = jwtSecurityTokenHandler.ReadJwtToken(jwtToken);
+            var allowedTenantsClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == "allowed-tenants")?.Value!;
+
+            if (!string.IsNullOrEmpty(allowedTenantsClaim))
+            {
+                return allowedTenantsClaim.Split(',').SelectMany(x =>
+                {
+                    return new List<Tenant> { new(x) };
+                });
+            }
         }
 
         return [];

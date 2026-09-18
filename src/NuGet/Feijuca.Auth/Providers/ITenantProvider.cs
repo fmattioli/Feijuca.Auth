@@ -16,6 +16,8 @@ public interface ITenantProvider
 
     IEnumerable<Tenant> GetTenants();
 
+    IEnumerable<Tenant> GetAllowedTenants();
+
     Tenant GetTenant();
 
     Tenant? GetRequestedTenant();

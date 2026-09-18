@@ -86,6 +86,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
     public void SetTenants(IEnumerable<Tenant> tenants)
     {
         _tenants = tenants;
+        _tenant = tenants.First();
     }
 
     public void SetTenant(string tenant)

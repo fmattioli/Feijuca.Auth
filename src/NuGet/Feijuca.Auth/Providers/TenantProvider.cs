@@ -83,10 +83,9 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         }
     }
 
-    public void SetTenants(IEnumerable<Tenant> tenants)
+    public void SetAllowedTenants(IEnumerable<Tenant> tenants)
     {
         _tenants = tenants;
-        _tenant = tenants.First();
     }
 
     public void SetTenant(string tenant)
@@ -96,7 +95,7 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     public void SetEffectiveTenant()
     {
-        if (_requestedTenant?.Name == _tenant?.Name)
+        if (!_tenants.Select(x => x.Name).Contains(_requestedTenant.Name) || _requestedTenant?.Name == _tenant?.Name)
         {
             _requestedTenant = null!;
         }
@@ -136,20 +135,21 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
         return _tenant;
     }
 
-    public IEnumerable<Tenant> GetTenants()
+    public IEnumerable<Tenant> GetAllowedTenants()
     {
         string jwtToken = GetToken();
         if (!string.IsNullOrEmpty(jwtToken))
         {
             var tokenInfos = jwtSecurityTokenHandler.ReadJwtToken(jwtToken);
-            var tenantClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == "tenant")?.Value!;
+            var allowedTenantsClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == "allowed-tenants")?.Value!;
 
-            var tenants = tenantClaim.Split(',').SelectMany(x =>
+            if (!string.IsNullOrEmpty(allowedTenantsClaim))
             {
-                return new List<Tenant> { new(x) };
-            });
-
-            return tenants;
+                return allowedTenantsClaim.Split(',').SelectMany(x =>
+                {
+                    return new List<Tenant> { new(x) };
+                });
+            }
         }
 
         return [];

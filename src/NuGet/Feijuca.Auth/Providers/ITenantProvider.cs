@@ -14,7 +14,7 @@ public interface ITenantProvider
 
     IEnumerable<string> GetGroupNames();
 
-    IEnumerable<Tenant> GetTenants();
+    IEnumerable<Tenant> GetAllowedTenants();
 
     Tenant GetTenant();
 
@@ -30,7 +30,7 @@ public interface ITenantProvider
 
     string GetToken();
 
-    void SetTenants(IEnumerable<Tenant> tenants);
+    void SetAllowedTenants(IEnumerable<Tenant> tenants);
 
     void SetUser(User user);
 

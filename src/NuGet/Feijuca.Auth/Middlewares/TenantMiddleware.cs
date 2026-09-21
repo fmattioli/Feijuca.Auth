@@ -30,6 +30,7 @@ public class TenantMiddleware(RequestDelegate next)
 
         var tenants = tenantService.GetTenants();
         var user = tenantService.GetUser();
+        var allowedTenants = tenantService.GetAllowedTenants();
 
         if (!tenants.Any() || user.Id == Guid.Empty)
         {
@@ -45,7 +46,8 @@ public class TenantMiddleware(RequestDelegate next)
         }
 
         // Who is authenticated following JWT token
-        tenantService.SetTenants(tenants);
+        tenantService.SetTenant(tenants.First().Name);
+        tenantService.SetTenants(allowedTenants);
         tenantService.SetUser(user);
 
         tenantService.SetEffectiveTenant();

@@ -46,7 +46,8 @@ public class TenantMiddleware(RequestDelegate next)
         }
 
         // Who is authenticated following JWT token
-        tenantService.SetTenants(allowedTenants.Any() ? allowedTenants : tenants);
+        tenantService.SetTenant(tenants.First().Name);
+        tenantService.SetTenants(allowedTenants);
         tenantService.SetUser(user);
 
         tenantService.SetEffectiveTenant();

@@ -98,7 +98,10 @@ public class TenantProvider(IHttpContextAccessor httpContextAccessor, JwtSecurit
 
     public void SetEffectiveTenant()
     {
-        if (!_tenants.Select(x => x.Name).Contains(_requestedTenant.Name) || _requestedTenant?.Name == _tenant?.Name)
+        if (_requestedTenant == null)
+            return;
+
+        if (!_tenants.Select(x => x.Name).Contains(_requestedTenant.Name) || _requestedTenant.Name == _tenant.Name)
         {
             _requestedTenant = null!;
         }

@@ -16,4 +16,5 @@ public static class FeijucaErrors
     public static readonly Error ReplicateRealmError = new("ReplicateRealmError", "An error occured while replicating realm.");
     public static readonly Error RemoveUsersFromGroupError = new("RemoveUsersFromGroupError", "An error occurred while removing users from group.");
     public static readonly Error CreateRealmError = new("CreateRealmError", "An error occurred while creating realm.");
+    public static Error RequiredRoleError(string role) => new(role, $"The user does not have the required permission.");
 }

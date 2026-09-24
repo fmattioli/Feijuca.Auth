@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Feijuca.Auth.Errors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Feijuca.Auth.Attributes
@@ -24,7 +26,7 @@ namespace Feijuca.Auth.Attributes
                 return;
             }
 
-            context.Result = new ForbidResult();
+            context.Result = new ObjectResult(FeijucaErrors.RequiredRoleError) { StatusCode = StatusCodes.Status403Forbidden };
         }
     }
 }

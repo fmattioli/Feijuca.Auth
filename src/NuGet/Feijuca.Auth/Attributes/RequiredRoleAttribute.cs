@@ -26,7 +26,7 @@ namespace Feijuca.Auth.Attributes
                 return;
             }
 
-            context.Result = new ObjectResult(FeijucaErrors.RequiredRoleError) { StatusCode = StatusCodes.Status403Forbidden };
+            context.Result = new ObjectResult(FeijucaErrors.RequiredRoleError(_role)) { StatusCode = StatusCodes.Status403Forbidden };
         }
     }
 }

@@ -581,6 +581,5 @@ namespace Feijuca.Auth.Infra.Data.Repositories
 
             return await RevokeSessionsByUserIdAsync(id, cancellationToken);
         }
-
     }
 }

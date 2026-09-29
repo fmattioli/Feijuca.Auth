@@ -548,5 +548,39 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             var sessions = JsonConvert.DeserializeObject<IEnumerable<KeycloakSession>>(content)!;
             return Result<IEnumerable<KeycloakSession>>.Success(sessions);
         }
+
+        public async Task<Result<bool>> DisableAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
+            using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
+
+            var url = httpClient.BaseAddress
+                .AppendPathSegment("admin")
+                .AppendPathSegment("realms")
+                .AppendPathSegment(_tenantService.Tenant.Name)
+                .AppendPathSegment("users")
+                .AppendPathSegment(id);
+
+            var userData = new
+            {
+                enabled = false
+            };
+
+            var json = JsonConvert.SerializeObject(userData, Settings);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using var response = await httpClient.PutAsync(url, content, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseMessage = await response.Content.ReadAsStringAsync(cancellationToken);
+                UserErrors.SetTechnicalMessage(responseMessage);
+
+                return Result<bool>.Failure(UserErrors.DisableUserError);
+            }
+
+            return await RevokeSessionsByUserIdAsync(id, cancellationToken);
+        }
+
     }
 }

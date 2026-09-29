@@ -139,6 +139,34 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     /// <summary>
+    /// Disables an existing user in the specified Keycloak realm, keeping the user and its history.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to be disabled.</param>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
+    /// <returns>
+    /// A 204 No Content status code if the user is successfully disabled;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    [HttpPatch]
+    [Route("{id}/disable", Name = nameof(DisableUser))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    [Authorize]
+    public async Task<IActionResult> DisableUser([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new DisableUserCommand(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    /// <summary>
     /// Revokes all active sessions for a specified user in Keycloak.
     /// </summary>
     /// <param name="id">The unique identifier of the user whose sessions are to be revoked.</param>

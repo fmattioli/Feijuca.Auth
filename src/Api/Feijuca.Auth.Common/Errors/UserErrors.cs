@@ -75,6 +75,11 @@ namespace Feijuca.Auth.Common.Errors
             $"An error occurred while updating the user's password. {TechnicalMessage}"
         );
 
+        public static Error DisableUserError => new(
+            "User.DisableUserError",
+            $"An error occurred while trying to disable the user: {TechnicalMessage}"
+);
+
         public static void SetTechnicalMessage(string technicalMessage)
         {
             TechnicalMessage = technicalMessage;

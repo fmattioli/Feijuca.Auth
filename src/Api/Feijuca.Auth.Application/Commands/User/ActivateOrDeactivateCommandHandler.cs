@@ -1,6 +1,7 @@
 ﻿using Feijuca.Auth.Models;
 using Feijuca.Auth.Domain.Interfaces;
 using LiteBus.Commands.Abstractions;
+using Feijuca.Auth.Common.Errors;
 
 namespace Feijuca.Auth.Application.Commands.User
 {
@@ -17,7 +18,7 @@ namespace Feijuca.Auth.Application.Commands.User
                 return Result<bool>.Success(true);
             }
 
-            return Result<bool>.Failure(result.Error);
+            return Result<bool>.Failure(UserErrors.UpdateUserStatusError);
         }
     }
 }

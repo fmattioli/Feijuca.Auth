@@ -150,7 +150,7 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     /// otherwise, a 400 Bad Request status code with an error message.
     /// </returns>
     [HttpPatch]
-    [Route("{id}/activate-or-deactivate", Name = nameof(ActivateOrDeactivate))]
+    [Route("{id}/change-status", Name = nameof(ActivateOrDeactivate))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

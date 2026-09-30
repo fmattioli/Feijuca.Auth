@@ -139,24 +139,27 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     /// <summary>
-    /// Disables an existing user in the specified Keycloak realm, keeping the user and its history.
+    /// Activates or deactivates a user in the specified Keycloak realm, keeping the user and its history.
+    /// When deactivating, all active sessions of the user are revoked.
     /// </summary>
-    /// <param name="id">The unique identifier of the user to be disabled.</param>
+    /// <param name="id">The unique identifier of the user to be activated or deactivated.</param>
+    /// <param name="activateOrDeactivateRequest">The request containing the desired activation state.</param>
     /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
     /// <returns>
-    /// A 204 No Content status code if the user is successfully disabled;
+    /// A 204 No Content status code if the user status is successfully updated;
     /// otherwise, a 400 Bad Request status code with an error message.
     /// </returns>
     [HttpPatch]
-    [Route("{id}/disable", Name = nameof(DisableUser))]
+    [Route("{id}/activate-or-deactivate", Name = nameof(ActivateOrDeactivate))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [RequiredRole("Feijuca.ApiWriter")]
     [Authorize]
-    public async Task<IActionResult> DisableUser([FromRoute] Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ActivateOrDeactivate([FromRoute] Guid id, [FromBody] ActivateOrDeactivateRequest activateOrDeactivateRequest,
+        CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new DisableUserCommand(id), cancellationToken);
+        var result = await commandMediator.SendAsync(new ActivateOrDeactivateCommand(id, activateOrDeactivateRequest), cancellationToken);
 
         if (result.IsSuccess)
         {

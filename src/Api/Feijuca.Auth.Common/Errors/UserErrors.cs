@@ -74,11 +74,20 @@ namespace Feijuca.Auth.Common.Errors
             "User.ResetPassword",
             $"An error occurred while updating the user's password. {TechnicalMessage}"
         );
+        public static Error UpdateUserStatusError => new(
+            "User.UpdateUserStatusError",
+            $"An error occurred while trying to activate or deactivate the user: {TechnicalMessage}"
+        );
 
-        public static Error DisableUserError => new(
-            "User.DisableUserError",
-            $"An error occurred while trying to disable the user: {TechnicalMessage}"
-);
+        public static Error ActivateUserError => new(
+            "User.ActivateUserError",
+            $"An error occurred while trying to activate the user: {TechnicalMessage}"
+        );
+
+        public static Error DeactivateUserError => new(
+            "User.DeactivateUserError",
+            $"An error occurred while trying to deactivate the user: {TechnicalMessage}"
+        );
 
         public static void SetTechnicalMessage(string technicalMessage)
         {

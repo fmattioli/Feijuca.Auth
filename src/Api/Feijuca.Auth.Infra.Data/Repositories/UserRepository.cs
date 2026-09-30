@@ -549,7 +549,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             return Result<IEnumerable<KeycloakSession>>.Success(sessions);
         }
 
-        public async Task<Result<bool>> DisableAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Result<bool>> ActivateOrDeactivateAsync(Guid id, bool isActive, CancellationToken cancellationToken)
         {
             var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
             using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);
@@ -561,14 +561,8 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 .AppendPathSegment("users")
                 .AppendPathSegment(id);
 
-            var userData = new
-            {
-                enabled = false
-            };
-
-            var json = JsonConvert.SerializeObject(userData, Settings);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            var json = JsonConvert.SerializeObject(new { enabled = isActive }, Settings);
+            using var content = new StringContent(json, Encoding.UTF8, "application/json");
             using var response = await httpClient.PutAsync(url, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -576,7 +570,12 @@ namespace Feijuca.Auth.Infra.Data.Repositories
                 var responseMessage = await response.Content.ReadAsStringAsync(cancellationToken);
                 UserErrors.SetTechnicalMessage(responseMessage);
 
-                return Result<bool>.Failure(UserErrors.DisableUserError);
+                return Result<bool>.Failure(UserErrors.UpdateUserStatusError);
+            }
+
+            if (isActive)
+            {
+                return Result<bool>.Success(true);
             }
 
             return await RevokeSessionsByUserIdAsync(id, cancellationToken);

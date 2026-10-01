@@ -23,7 +23,7 @@ namespace Feijuca.Auth.Domain.Interfaces
         Task<Result<TokenDetails>> LoginAsync(string username, string password, CancellationToken cancellationToken);
         Task<Result<bool>> SignoutAsync(string refreshToken, CancellationToken cancellationToken);
         Task<Result<TokenDetails>> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
-        Task<Result<bool>> ActivateOrDeactivateAsync(Guid id, bool isActive, CancellationToken cancellationToken);
+        Task<Result<bool>> ActivateUserAsync(Guid id, bool isActive, CancellationToken cancellationToken);
 
     }
 }

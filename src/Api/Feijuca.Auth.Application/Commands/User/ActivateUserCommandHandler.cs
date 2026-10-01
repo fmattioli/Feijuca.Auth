@@ -5,13 +5,13 @@ using Feijuca.Auth.Common.Errors;
 
 namespace Feijuca.Auth.Application.Commands.User
 {
-    public class ActivateOrDeactivateCommandHandler(IUserRepository userRepository) : ICommandHandler<ActivateOrDeactivateCommand, Result<bool>>
+    public class ActivateUserCommandHandler(IUserRepository userRepository) : ICommandHandler<ActivateUserCommand, Result<bool>>
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<Result<bool>> HandleAsync(ActivateOrDeactivateCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> HandleAsync(ActivateUserCommand request, CancellationToken cancellationToken)
         {
-            var result = await _userRepository.ActivateOrDeactivateAsync(request.Id, request.Request.IsActive, cancellationToken);
+            var result = await _userRepository.ActivateUserAsync(request.Id, request.Request.IsActive, cancellationToken);
 
             if (result.IsSuccess)
             {

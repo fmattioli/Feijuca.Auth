@@ -4,5 +4,5 @@ using LiteBus.Commands.Abstractions;
 
 namespace Feijuca.Auth.Application.Commands.User
 {
-    public record ActivateOrDeactivateCommand(Guid Id, ActivateOrDeactivateRequest Request) : ICommand<Result<bool>>;
+    public record ActivateUserCommand(Guid Id, ActivateUserRequest Request) : ICommand<Result<bool>>;
 }

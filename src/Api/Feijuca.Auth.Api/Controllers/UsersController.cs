@@ -143,23 +143,23 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     /// When deactivating, all active sessions of the user are revoked.
     /// </summary>
     /// <param name="id">The unique identifier of the user to be activated or deactivated.</param>
-    /// <param name="activateOrDeactivateRequest">The request containing the desired activation state.</param>
+    /// <param name="activateUserRequest">The request containing the desired activation state.</param>
     /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
     /// <returns>
     /// A 204 No Content status code if the user status is successfully updated;
     /// otherwise, a 400 Bad Request status code with an error message.
     /// </returns>
     [HttpPatch]
-    [Route("{id}/change-status", Name = nameof(ActivateOrDeactivate))]
+    [Route("{id}/change-status", Name = nameof(ActivateUser))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [RequiredRole("Feijuca.ApiWriter")]
     [Authorize]
-    public async Task<IActionResult> ActivateOrDeactivate([FromRoute] Guid id, [FromBody] ActivateOrDeactivateRequest activateOrDeactivateRequest,
+    public async Task<IActionResult> ActivateUser([FromRoute] Guid id, [FromBody] ActivateUserRequest activateUserRequest,
         CancellationToken cancellationToken)
     {
-        var result = await commandMediator.SendAsync(new ActivateOrDeactivateCommand(id, activateOrDeactivateRequest), cancellationToken);
+        var result = await commandMediator.SendAsync(new ActivateUserCommand(id, activateUserRequest), cancellationToken);
 
         if (result.IsSuccess)
         {

@@ -549,7 +549,7 @@ namespace Feijuca.Auth.Infra.Data.Repositories
             return Result<IEnumerable<KeycloakSession>>.Success(sessions);
         }
 
-        public async Task<Result<bool>> ActivateOrDeactivateAsync(Guid id, bool isActive, CancellationToken cancellationToken)
+        public async Task<Result<bool>> ActivateUserAsync(Guid id, bool isActive, CancellationToken cancellationToken)
         {
             var tokenDetails = await _authRepository.GetAccessTokenAsync(cancellationToken);
             using var httpClient = CreateHttpClientWithHeaders(tokenDetails.Data.Access_Token);

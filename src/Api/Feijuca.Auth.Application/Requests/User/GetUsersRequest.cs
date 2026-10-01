@@ -20,6 +20,9 @@ namespace Feijuca.Auth.Application.Requests.User
         public IEnumerable<string>? Usernames { get; set; }
 
         [FromQuery]
+        public bool? IsEnabled { get; set; }
+
+        [FromQuery]
         public IEnumerable<string>? AttributeKeys { get; set; }
 
         [FromQuery]

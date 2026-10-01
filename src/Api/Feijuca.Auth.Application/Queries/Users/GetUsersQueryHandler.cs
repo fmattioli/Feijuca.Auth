@@ -44,6 +44,11 @@ namespace Feijuca.Auth.Application.Queries.Users
                         });
                 }
             }
+
+            if (request.GetUsersRequest.IsEnabled != null)
+            {
+                filteredUsers = filteredUsers.Where(u => u.Enabled == request.GetUsersRequest.IsEnabled);
+            }
             
             var users = filteredUsers.ToList();
             return Result<Responses.PagedResult<UserResponse>>.Success(users.ToUserResponse(request.GetUsersRequest.PageFilter, _tenantService.Tenant.Name, totalUsers));

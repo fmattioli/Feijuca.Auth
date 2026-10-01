@@ -140,6 +140,37 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     }
 
     /// <summary>
+    /// Activates or deactivates a user in the specified Keycloak realm, keeping the user and its history.
+    /// When deactivating, all active sessions of the user are revoked.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to be activated or deactivated.</param>
+    /// <param name="activateUserRequest">The request containing the desired activation state.</param>
+    /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> that can be used to signal cancellation for the operation.</param>
+    /// <returns>
+    /// A 204 No Content status code if the user status is successfully updated;
+    /// otherwise, a 400 Bad Request status code with an error message.
+    /// </returns>
+    [HttpPatch]
+    [Route("{id}/active", Name = nameof(ActivateUser))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequiredRole("Feijuca.ApiWriter")]
+    [Authorize]
+    public async Task<IActionResult> ActivateUser([FromRoute] Guid id, [FromBody] ActivateUserRequest activateUserRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await commandMediator.SendAsync(new ActivateUserCommand(id, activateUserRequest), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    /// <summary>
     /// Revokes all active sessions for a specified user in Keycloak.
     /// </summary>
     /// <param name="id">The unique identifier of the user whose sessions are to be revoked.</param>

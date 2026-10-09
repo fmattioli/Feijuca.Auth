@@ -5,6 +5,7 @@ using Feijuca.Auth.Domain.Interfaces;
 using Feijuca.Auth.Providers;
 using LiteBus.Commands.Abstractions;
 using Feijuca.Auth.Models;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Feijuca.Auth.Application.Queries.Realm
 {
@@ -229,15 +230,19 @@ namespace Feijuca.Auth.Application.Queries.Realm
 
         private async Task<Domain.Entities.User> CreateUserAsync(ReplicateRealmCommand request, string targetTenant, CancellationToken cancellationToken)
         {
-            var user = new Domain.Entities.User(request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
+            var parts = request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username.Split('@');
+            var userName = parts[0];
+            var lastName = parts[1].Split('.')[0];
+
+            var user = new Domain.Entities.User(userName,
                 request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Password,
                 request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
-                request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
-                request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
-                 new Dictionary<string, string[]>
-                 {
-                     { "Tenant", [targetTenant] }
-                 });
+                userName,
+                lastName,
+                new Dictionary<string, string[]>
+                {
+                    { "Tenant", [targetTenant] }
+                });
 
             var creationUserResult = await userRepository.CreateAsync(user, cancellationToken);
 

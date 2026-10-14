@@ -231,13 +231,13 @@ namespace Feijuca.Auth.Application.Queries.Realm
         private async Task<Domain.Entities.User> CreateUserAsync(ReplicateRealmCommand request, string targetTenant, CancellationToken cancellationToken)
         {
             var parts = request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username.Split('@');
-            var userName = parts[0];
+            var firstName = parts[0];
             var lastName = parts[1].Split('.')[0];
 
-            var user = new Domain.Entities.User(userName,
+            var user = new Domain.Entities.User(request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
                 request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Password,
                 request.ReplicateRealmRequest.ReplicationConfigurationRequest.AdminUser.Username,
-                userName,
+                firstName,
                 lastName,
                 new Dictionary<string, string[]>
                 {

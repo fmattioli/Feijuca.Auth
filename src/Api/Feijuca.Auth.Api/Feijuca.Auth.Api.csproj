@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
-    <Version>1.123.2</Version>
+    <Version>1.124.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

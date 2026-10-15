@@ -92,5 +92,32 @@ namespace Feijuca.Auth.Api.Controllers
 
             return BadRequest(Result<string>.Failure(result.Error));
         }
+
+        /// <summary>
+        /// Registers a client role in the origin realm and propagates it to the other realms
+        /// (or to a specific target realm). Realms that fail propagation are logged.
+        /// </summary>
+        /// <param name="registerRequest">The role(s) to register and the optional target realm.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the operation.</param>
+        /// <returns>
+        /// A <see cref="StatusCodes.Status200OK"/> if the role was registered;
+        /// otherwise, a <see cref="StatusCodes.Status400BadRequest"/> containing the error details.
+        /// </returns>
+        [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [RequiredRole("Feijuca.ApiWriter")]
+        public async Task<IActionResult> RegisterClientRole([FromBody] RegisterClientRoleRequest registerRequest, CancellationToken cancellationToken)
+        {
+            var result = await commandMediator.SendAsync(new RegisterClientRoleCommand(registerRequest), cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                return Ok();
+            }
+
+            return BadRequest(result.Error);
+        }
     }
 }

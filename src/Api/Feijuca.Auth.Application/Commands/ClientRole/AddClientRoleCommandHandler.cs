@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 namespace Feijuca.Auth.Application.Commands.ClientRole;
 
 public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesRepository,
-    IRealmRepository realmRepository,
     ITenantProvider tenantProvider,
     ILogger<AddClientRoleCommandHandler> logger) : ICommandHandler<AddClientRoleCommand, Result<bool>>
 {
@@ -37,36 +36,6 @@ public class AddClientRoleCommandHandler(IClientRoleRepository clientRolesReposi
             }
         }
 
-        if (request.AddClientRolesRequest.AllTenants)
-        {
-            var realms = await realmRepository.GetAllAsync(cancellationToken);
-            var tenants = realms
-                .Where(r => r.Realm != tenantProvider.GetRequestedTenant()!.Name)
-                .Select(r => r.Realm);
-
-            foreach (var tenant in tenants)
-            {
-                foreach (var clientRole in request.AddClientRolesRequest.ClientRoles)
-                {
-                    var result = await _roleRepository.AddClientRoleAsync(
-                        clientRole.ClientId,
-                        clientRole.Name,
-                        clientRole.Description,
-                        tenantProvider.GetRequestedTenant()!.Name,
-                        cancellationToken);
-
-                    if (!result.IsSuccess)
-                    {
-                        logger.LogError("Failed to add client roles {clientRole} for tenant {Tenant}.", clientRole.Name, tenant);
-                    }
-                }
-
-                logger.LogInformation("Successfully added client roles for tenant {Tenant}.", tenant);
-            }
-
-            return Result<bool>.Success(true);
-        }
-        
-        return Result<bool>.Success(true); ;
+        return Result<bool>.Success(true);
     }
 }

@@ -39,11 +39,6 @@ namespace Feijuca.Auth.Application.Queries.Realm
                 await AssociateUserToTheGroupAsync(targetTenant, adminGroupId, user, cancellationToken);
             }
 
-            if (request.ReplicateRealmRequest!.ReplicationConfigurationRequest.IncludeGroupsConfig?.Include ?? false)
-            {
-                await CreateGroupsAsync(request, targetTenant, cancellationToken);
-            }
-
             var originClients = await clientRepository.GetClientsAsync(originTenant, cancellationToken);
 
             if (request.ReplicateRealmRequest.ReplicationConfigurationRequest.IncludeClients)
@@ -106,7 +101,7 @@ namespace Feijuca.Auth.Application.Queries.Realm
                 await clientScopesRepository.AddUserPropertyMapperAsync(clientScopeProfile.Id!, "tenant", "tenant", targetTenant, cancellationToken);
             }
 
-            if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroupsConfig.Include ?? false)
+            if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroupsConfig?.Include ?? false)
             {
                 IEnumerable<Group> originGroups = [];
                 if (request.ReplicateRealmRequest?.ReplicationConfigurationRequest.IncludeGroupsConfig.GroupNames?.Any() ?? false)
@@ -131,6 +126,11 @@ namespace Feijuca.Auth.Application.Queries.Realm
                         targetTenant,
                         [],
                         cancellationToken);
+
+                    if (!groupCreateId.IsSuccess)
+                    {
+                        return Result<bool>.Failure(RealmErrors.ReplicateRealmError);
+                    }
 
                     var rolesAssociatedToGroup = (await groupRolesRepository.GetGroupRolesAsync(
                             group.Id,
@@ -266,14 +266,6 @@ namespace Feijuca.Auth.Application.Queries.Realm
             }
 
             return string.Empty;
-        }
-
-        private async Task CreateGroupsAsync(ReplicateRealmCommand request, string targetTenant, CancellationToken cancellationToken)
-        {
-            foreach (var groupName in request.ReplicateRealmRequest.ReplicationConfigurationRequest.IncludeGroupsConfig.GroupNames ?? [])
-            {
-                await groupRepository.CreateAsync(groupName, targetTenant, [], cancellationToken);
-            }
         }
     }
 }

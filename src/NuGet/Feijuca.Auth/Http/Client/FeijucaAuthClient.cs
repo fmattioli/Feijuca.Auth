@@ -229,6 +229,27 @@ namespace Feijuca.Auth.Http.Client
         }
 
         /// <summary>
+        /// Deletes a group from the authentication service.
+        /// </summary>
+        /// <param name="groupId">Group identifier.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Success Result when group was deleted sucessfully</returns>
+        /// <returns>Failure Result when group wasn't deleted sucessfully</returns>
+        public async Task<Result> DeleteGroupAsync(Guid groupId, CancellationToken cancellationToken)
+        {
+            var response = await _httpClient.DeleteAsync($"groups/{groupId}", cancellationToken);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = JsonSerializer.Deserialize<Error>(content, _serializer);
+                return Result.Failure(error ?? FeijucaErrors.DeleteGroupError);
+            }
+
+            return Result.Success();
+        }
+
+        /// <summary>
         /// Sets the bearer token used in authenticated requests.
         /// </summary>
         /// <param name="jwtToken">JWT bearer token.</param>

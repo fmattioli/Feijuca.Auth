@@ -108,13 +108,10 @@ jobs:
 
   publish-nuget-package:
     name: Publish NuGet Package
-
     runs-on: ubuntu-latest
 
     needs:
       - bump
-
-    environment: production
 
     permissions:
       id-token: write
@@ -126,33 +123,27 @@ jobs:
        needs.bump.outputs.version_update_type == 'REVISION')
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+  
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-
-      - name: Restore
-        run: dotnet restore src/NuGet/Feijuca.Auth/Feijuca.Auth.csproj
-
-      - name: Build
-        run: |
+  
+      - run: dotnet restore src/NuGet/Feijuca.Auth/Feijuca.Auth.csproj
+  
+      - run: |
           dotnet build \
             src/NuGet/Feijuca.Auth/Feijuca.Auth.csproj \
             --configuration Release \
             --no-restore
-
-      - name: Pack
-        run: |
+  
+      - run: |
           dotnet pack \
             src/NuGet/Feijuca.Auth/Feijuca.Auth.csproj \
             --configuration Release \
             --no-build \
             --output ./nupkgs
-
-      - name: Publish package to NuGet
-        run: |
+  
+      - run: |
           dotnet nuget push "./nupkgs/*.nupkg" \
             --source "https://api.nuget.org/v3/index.json"

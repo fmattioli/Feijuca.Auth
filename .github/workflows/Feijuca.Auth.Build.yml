@@ -123,7 +123,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
         env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
 
       - name: Restore dependencies
         run: dotnet restore src/NuGet/Feijuca.Auth/Feijuca.Auth.csproj

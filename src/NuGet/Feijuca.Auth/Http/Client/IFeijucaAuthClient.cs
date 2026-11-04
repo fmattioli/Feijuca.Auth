@@ -19,6 +19,7 @@ public interface IFeijucaAuthClient
     Task<Result> ReplicateRealmAsync(ReplicateRealmRequest request, CancellationToken cancellationToken);
     Task<Result> CreateRealmAsync(AddRealmRequest addRealmRequest, CancellationToken cancellationToken);
     Task<Result> UpdateGroupNameAsync(Guid groupId, UpdateGroupNameRequest request, CancellationToken cancellationToken);
+    Task<Result> DeleteGroupAsync(Guid groupId, CancellationToken cancellationToken);
     void SetToken(string token);
     void SetHeaders(params (string Name, string Value)[] headers);
 }

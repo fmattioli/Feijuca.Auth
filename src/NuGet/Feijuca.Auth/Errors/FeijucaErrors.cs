@@ -18,4 +18,6 @@ public static class FeijucaErrors
     public static readonly Error CreateRealmError = new("CreateRealmError", "An error occurred while creating realm.");
     public static Error RequiredRoleError(string role) => new(role, $"The user does not have the required permission.");
     public static readonly Error DeleteGroupError = new("DeleteGroupError", "An error occurred while deleting group.");
+
+    //Test
 }

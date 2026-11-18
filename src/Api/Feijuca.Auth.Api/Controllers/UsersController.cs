@@ -207,6 +207,7 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     /// otherwise, a 400 Bad Request status code with an error message.
     /// </returns>
     [HttpPost]
+    [Authorize]
     [Route("logout", Name = nameof(Logout))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -296,6 +297,7 @@ public class UsersController(ICommandMediator commandMediator, IQueryMediator qu
     /// otherwise, a 400 Bad Request status code if the refresh token is invalid or expired.
     /// </returns>
     [HttpPost]
+    [Authorize]
     [Route("refresh-token", Name = nameof(RefreshToken))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
